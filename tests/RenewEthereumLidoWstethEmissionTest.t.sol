@@ -41,17 +41,21 @@ contract RenewEthereumLidoWstethEmissionTest is BaseTest {
   ITransferStrategyBase constant TRANSFER_STRATEGY =
     ITransferStrategyBase(0x4fDB95C607EDe09A548F60685b56C034992B194a);
 
-  uint256 constant TOTAL_DISTRIBUTION = 6 ether; // 6 awstETH
-  uint88 constant NEW_DURATION_DISTRIBUTION = 4 days; // 1 week
+  uint256 constant TOTAL_DISTRIBUTION = 4.5 ether; // 6 awstETH
+  uint88 constant NEW_DURATION_DISTRIBUTION = 3 days; // 3 days
 
   address WHALE_1 = 0xAcE958933051f762d1B8872E3582A173d8279628; // 1.03% of the supply
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 21037679);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21041245);
   }
 
   function test_extend() public {
     vm.startPrank(EMISSION_ADMIN);
+
+    uint256 lastEmissionEndingTime = IAaveIncentivesController(
+      AaveV3EthereumLido.DEFAULT_INCENTIVES_CONTROLLER
+    ).getDistributionEnd(ASSET, REWARD_ASSET);
 
     emit log_named_address('emissionManager', AaveV3EthereumLido.EMISSION_MANAGER);
 
@@ -79,12 +83,13 @@ contract RenewEthereumLidoWstethEmissionTest is BaseTest {
 
     vm.stopPrank();
 
-    _testClaimRewardsForWhale(WHALE_1, ASSET, 0.0103 ether); // 1.03%
+    _testClaimRewardsForWhale(WHALE_1, ASSET, lastEmissionEndingTime, 0.0103 ether); // 1.03%
   }
 
   function _testClaimRewardsForWhale(
     address whale,
     address asset,
+    uint256 lastEmissionEndingTime,
     uint256 expectedRewardPercentage
   ) internal {
     vm.startPrank(whale);
@@ -98,7 +103,16 @@ contract RenewEthereumLidoWstethEmissionTest is BaseTest {
 
     uint256 balanceBefore = IERC20(REWARD_ASSET).balanceOf(whale);
 
-    vm.warp(block.timestamp + NEW_DURATION_DISTRIBUTION);
+    // emit log_named_uint('lastEmissionEndingTime', lastEmissionEndingTime);
+    // emit log_named_uint('NEW_DURATION_DISTRIBUTION', NEW_DURATION_DISTRIBUTION);
+    // emit log_named_uint(
+    //   'lastEmissionEndingTime + NEW_DURATION_DISTRIBUTION',
+    //   lastEmissionEndingTime + NEW_DURATION_DISTRIBUTION
+    // );
+
+    vm.warp(lastEmissionEndingTime + NEW_DURATION_DISTRIBUTION);
+
+    emit log_named_uint('New emission end timestamp', vm.getBlockTimestamp());
 
     IAaveIncentivesController(AaveV3EthereumLido.DEFAULT_INCENTIVES_CONTROLLER).claimRewards(
       assets,
@@ -148,8 +162,13 @@ contract RenewEthereumLidoWstethEmissionTest is BaseTest {
 
     newDistributionEndPerAsset.asset = ASSET;
     newDistributionEndPerAsset.reward = REWARD_ASSET;
+
+    uint256 lastEmissionEndingTime = IAaveIncentivesController(
+      AaveV3EthereumLido.DEFAULT_INCENTIVES_CONTROLLER
+    ).getDistributionEnd(ASSET, REWARD_ASSET);
+
     newDistributionEndPerAsset.newDistributionEnd = _toUint32(
-      block.timestamp + NEW_DURATION_DISTRIBUTION
+      lastEmissionEndingTime + NEW_DURATION_DISTRIBUTION
     );
 
     return newDistributionEndPerAsset;
