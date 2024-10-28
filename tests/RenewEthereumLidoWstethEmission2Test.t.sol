@@ -9,7 +9,7 @@ import {IAaveIncentivesController} from '../src/interfaces/IAaveIncentivesContro
 import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../src/interfaces/IEmissionManager.sol';
 import {BaseTest} from './utils/BaseTest.sol';
 
-contract RenewEthereumLidoWstethEmissionTest is BaseTest {
+contract RenewEthereumLidoWstethEmission2Test is BaseTest {
   /// @dev Used to simplify the configuration of new emissions per second after the emissions program has been created
   /// @param asset The asset for which new emissions per second needs to be configured
   /// @param rewards The rewards for which new emissions per second needs to be configured
@@ -41,13 +41,13 @@ contract RenewEthereumLidoWstethEmissionTest is BaseTest {
   ITransferStrategyBase constant TRANSFER_STRATEGY =
     ITransferStrategyBase(0x4fDB95C607EDe09A548F60685b56C034992B194a);
 
-  uint256 constant TOTAL_DISTRIBUTION = 4.5 ether; // 6 awstETH
-  uint88 constant NEW_DURATION_DISTRIBUTION = 3 days; // 3 days
+  uint256 constant TOTAL_DISTRIBUTION = 10.5 ether; // 10.5 awstETH
+  uint88 constant NEW_DURATION_DISTRIBUTION = 1 weeks; // 1 week
 
-  address WHALE_1 = 0xAcE958933051f762d1B8872E3582A173d8279628; // 1.03% of the supply
+  address WHALE_1 = 0xAcE958933051f762d1B8872E3582A173d8279628; // 1.01% of the supply
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 21041245);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21063076);
   }
 
   function test_extend() public {
@@ -83,7 +83,7 @@ contract RenewEthereumLidoWstethEmissionTest is BaseTest {
 
     vm.stopPrank();
 
-    _testClaimRewardsForWhale(WHALE_1, ASSET, lastEmissionEndingTime, 0.0103 ether); // 1.03%
+    _testClaimRewardsForWhale(WHALE_1, ASSET, lastEmissionEndingTime, 0.0101 ether); // 1.01%
   }
 
   function _testClaimRewardsForWhale(
