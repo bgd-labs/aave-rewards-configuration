@@ -28,14 +28,15 @@ contract EmissionTestMetMetis is BaseTest {
   ITransferStrategyBase constant TRANSFER_STRATEGY =
     ITransferStrategyBase(0xC353D1A5C4242F400b61EEe34dC2213cdAb4Ef80);
 
-  uint256 constant TOTAL_DISTRIBUTION = 6750 ether; // 6750 Metis/month
-  uint88 constant DURATION_DISTRIBUTION = 30 days;
+  uint256 constant TOTAL_DISTRIBUTION = 37 * 80 ether; // 80 Metis/day
+  uint88 constant DURATION_DISTRIBUTION = 37 days;
+
 
   address METIS_WHALE = 0xD3545B9E29cefd2273d2C6f64b4Ee8ebBaE5Af11;
   address vWETH_WHALE = 0x77d0Fb80eb7902c9A8952A47e0D189dB845fceb7;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('metis'), 8284260);
+    vm.createSelectFork(vm.rpcUrl('metis'), 18848331);
   }
 
   function test_metis_activation() public {
@@ -62,12 +63,12 @@ contract EmissionTestMetMetis is BaseTest {
 
     // fund the emissions admin
     vm.startPrank(METIS_WHALE);
-    IERC20(REWARD_ASSET).transfer(EMISSION_ADMIN, 6750 ether);
+    IERC20(REWARD_ASSET).transfer(EMISSION_ADMIN, TOTAL_DISTRIBUTION);
     vm.stopPrank();
 
     // test claim rewards
     vm.startPrank(vWETH_WHALE);
-    vm.warp(block.timestamp + 30 days);
+    vm.warp(block.timestamp + DURATION_DISTRIBUTION);
 
     address[] memory assets = new address[](1);
     assets[0] = AaveV3MetisAssets.WETH_V_TOKEN;
@@ -86,8 +87,8 @@ contract EmissionTestMetMetis is BaseTest {
 
     uint256 balanceAfter = IERC20(REWARD_ASSET).balanceOf(vWETH_WHALE);
 
-    uint256 expectedRewards = vWethWhaleBalance * (675 ether) / vWethSupply;
-    uint256 deviationAccepted = 5 ether;
+    uint256 expectedRewards = vWethWhaleBalance * (TOTAL_DISTRIBUTION * 3_35 / 10000) / vWethSupply;
+    uint256 deviationAccepted = 2 ether;
     assertApproxEqAbs(
       balanceAfter - balanceBefore,
       expectedRewards,
@@ -124,15 +125,15 @@ contract EmissionTestMetMetis is BaseTest {
 
     emissionsPerAsset[0] = EmissionPerAsset({
       asset: AaveV3MetisAssets.Metis_A_TOKEN,
-      emission: TOTAL_DISTRIBUTION * 5 / 100 // 5% of the distribution
+      emission: TOTAL_DISTRIBUTION * 45 / 100 // 45% of the distribution
     });
     emissionsPerAsset[1] = EmissionPerAsset({
       asset: AaveV3MetisAssets.WETH_A_TOKEN,
-      emission: TOTAL_DISTRIBUTION * 10 / 100 // 10% of the distribution
+      emission: TOTAL_DISTRIBUTION * 1_65 / 10000 // 1.65% of the distribution
     });
     emissionsPerAsset[2] = EmissionPerAsset({
       asset: AaveV3MetisAssets.mDAI_V_TOKEN,
-      emission: TOTAL_DISTRIBUTION * 15 / 100 // 15% of the distribution
+      emission: TOTAL_DISTRIBUTION * 3 / 100 // 3% of the distribution
     });
     emissionsPerAsset[3] = EmissionPerAsset({
       asset: AaveV3MetisAssets.Metis_V_TOKEN,
@@ -140,22 +141,22 @@ contract EmissionTestMetMetis is BaseTest {
     });
     emissionsPerAsset[4] = EmissionPerAsset({
       asset: AaveV3MetisAssets.mUSDC_V_TOKEN,
-      emission: TOTAL_DISTRIBUTION * 275 / 1000 // 27.5% of the distribution
+      emission: TOTAL_DISTRIBUTION * 22 / 100 // 22% of the distribution
     });
     emissionsPerAsset[5] = EmissionPerAsset({
       asset: AaveV3MetisAssets.mUSDT_V_TOKEN,
-      emission: TOTAL_DISTRIBUTION * 275 / 1000 // 27.5% of the distribution
+      emission: TOTAL_DISTRIBUTION * 20 / 100 // 20% of the distribution
     });
     emissionsPerAsset[6] = EmissionPerAsset({
       asset: AaveV3MetisAssets.WETH_V_TOKEN,
-      emission: TOTAL_DISTRIBUTION * 10 / 100 // 10% of the distribution
+      emission: TOTAL_DISTRIBUTION * 3_35 / 10000 // 1.65% of the distribution
     });
 
     uint256 totalDistribution;
     for (uint256 i = 0; i < emissionsPerAsset.length; i++) {
       totalDistribution += emissionsPerAsset[i].emission;
     }
-    assertApproxEqAbs(totalDistribution, TOTAL_DISTRIBUTION, 0.5 ether, 'INVALID_SUM_OF_EMISSIONS');
+    assertApproxEqAbs(totalDistribution, TOTAL_DISTRIBUTION, 0, 'INVALID_SUM_OF_EMISSIONS');
 
     return emissionsPerAsset;
   }
