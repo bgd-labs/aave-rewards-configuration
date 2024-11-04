@@ -71,6 +71,10 @@ abstract contract LMBaseTest is Test {
     );
     uint256 balanceAfter = IERC20(this.REWARD_ASSET()).balanceOf(whale);
 
+    emit log_named_uint('balanceBefore', balanceBefore);
+    emit log_named_uint('balanceAfter', balanceAfter);
+    emit log_named_uint('expectedReward', expectedReward);
+
     assertApproxEqRel(
       balanceAfter - balanceBefore,
       expectedReward, // Approx estimated rewards with current emissions
