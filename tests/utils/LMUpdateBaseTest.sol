@@ -10,45 +10,51 @@ import {IEmissionManager} from '../../src/interfaces/IEmissionManager.sol';
 
 abstract contract LMUpdateBaseTest is LMBaseTest {
   function test_setNewEmissionPerSecond() public {
-    NewEmissionPerAsset memory newEmissionPerAsset = _getNewEmissionPerSecond();
+    NewEmissionPerAsset[] memory newEmissionsPerAsset = _getNewEmissionPerSecond();
     vm.startPrank(this.EMISSION_ADMIN());
 
     // The emission admin can change the emission per second of the reward after the rewards have been configured.
     // Here we change the initial emission per second to the new one.
-    IEmissionManager(this.EMISSION_MANAGER()).setEmissionPerSecond(
-      newEmissionPerAsset.asset,
-      newEmissionPerAsset.rewards,
-      newEmissionPerAsset.newEmissionsPerSecond
-    );
-    emit log_named_bytes(
-      'calldata to execute tx on EMISSION_MANAGER to set the new emission per second from the emissions admin (safe)',
-      abi.encodeWithSelector(
-        IEmissionManager.setEmissionPerSecond.selector,
+    for (uint i = 0; i < newEmissionsPerAsset.length; i++) {
+      NewEmissionPerAsset memory newEmissionPerAsset = newEmissionsPerAsset[i];
+      IEmissionManager(this.EMISSION_MANAGER()).setEmissionPerSecond(
         newEmissionPerAsset.asset,
         newEmissionPerAsset.rewards,
         newEmissionPerAsset.newEmissionsPerSecond
-      )
-    );
+      );
+      emit log_named_bytes(
+        'calldata to execute tx on EMISSION_MANAGER to set the new emission per second from the emissions admin (safe)',
+        abi.encodeWithSelector(
+          IEmissionManager.setEmissionPerSecond.selector,
+          newEmissionPerAsset.asset,
+          newEmissionPerAsset.rewards,
+          newEmissionPerAsset.newEmissionsPerSecond
+        )
+      );
+    }
   }
 
   function test_setNewDistributionEnd() public {
-    NewDistributionEndPerAsset memory newDistributionEndPerAsset = _getNewDistributionEnd();
+    NewDistributionEndPerAsset[] memory newDistributionsEndPerAsset = _getNewDistributionEnd();
     vm.startPrank(this.EMISSION_ADMIN());
 
-    IEmissionManager(this.EMISSION_MANAGER()).setDistributionEnd(
-      newDistributionEndPerAsset.asset,
-      newDistributionEndPerAsset.reward,
-      newDistributionEndPerAsset.newDistributionEnd
-    );
-    emit log_named_bytes(
-      'calldata to execute tx on EMISSION_MANAGER to set the new distribution end from the emissions admin (safe)',
-      abi.encodeWithSelector(
-        IEmissionManager.setDistributionEnd.selector,
+    for (uint i = 0; i < newDistributionsEndPerAsset.length; i++) {
+      NewDistributionEndPerAsset memory newDistributionEndPerAsset = newDistributionsEndPerAsset[i];
+      IEmissionManager(this.EMISSION_MANAGER()).setDistributionEnd(
         newDistributionEndPerAsset.asset,
         newDistributionEndPerAsset.reward,
         newDistributionEndPerAsset.newDistributionEnd
-      )
-    );
+      );
+      emit log_named_bytes(
+        'calldata to execute tx on EMISSION_MANAGER to set the new distribution end from the emissions admin (safe)',
+        abi.encodeWithSelector(
+          IEmissionManager.setDistributionEnd.selector,
+          newDistributionEndPerAsset.asset,
+          newDistributionEndPerAsset.reward,
+          newDistributionEndPerAsset.newDistributionEnd
+        )
+      );
+    }
   }
 
   function test_transferStrategyHasSufficientAllowance() public {
@@ -70,17 +76,22 @@ abstract contract LMUpdateBaseTest is LMBaseTest {
   }
 
   function test_validateLMParams() public {
-    NewDistributionEndPerAsset memory distributionEnds = _getNewDistributionEnd();
-    NewEmissionPerAsset memory emissionsPerAsset = _getNewEmissionPerSecond();
+    NewDistributionEndPerAsset[] memory allDistributionEnds = _getNewDistributionEnd();
+    NewEmissionPerAsset[] memory allEmissionsPerAsset = _getNewEmissionPerSecond();
 
-    assertGt(distributionEnds.newDistributionEnd, block.timestamp - 1 hours);
+    for (uint i = 0; i < allDistributionEnds.length; i++) {
+      assertGt(allDistributionEnds[i].newDistributionEnd, block.timestamp - 1 hours);
+    }
 
-    for (uint i = 0; i < emissionsPerAsset.rewards.length; i++) {
-      _validateIndexDoesNotOverflow(
-        emissionsPerAsset.asset,
-        emissionsPerAsset.newEmissionsPerSecond[i]
-      );
-      _validateIndexNotZero(emissionsPerAsset.asset, emissionsPerAsset.newEmissionsPerSecond[i]);
+    for (uint i = 0; i < allEmissionsPerAsset.length; i++) {
+      NewEmissionPerAsset memory emissionsPerAsset = allEmissionsPerAsset[i];
+      for (uint j = 0; j < emissionsPerAsset.rewards.length; j++) {
+        _validateIndexDoesNotOverflow(
+          emissionsPerAsset.asset,
+          emissionsPerAsset.newEmissionsPerSecond[j]
+        );
+        _validateIndexNotZero(emissionsPerAsset.asset, emissionsPerAsset.newEmissionsPerSecond[j]);
+      }
     }
   }
 
@@ -114,9 +125,9 @@ abstract contract LMUpdateBaseTest is LMBaseTest {
     internal
     view
     virtual
-    returns (NewDistributionEndPerAsset memory);
+    returns (NewDistributionEndPerAsset[] memory);
 
-  function _getNewEmissionPerSecond() internal pure virtual returns (NewEmissionPerAsset memory);
+  function _getNewEmissionPerSecond() internal view virtual returns (NewEmissionPerAsset[] memory);
 
   function NEW_TOTAL_DISTRIBUTION() external virtual returns (uint256);
 
