@@ -71,11 +71,16 @@ abstract contract LMBaseTest is Test {
     );
     uint256 balanceAfter = IERC20(this.REWARD_ASSET()).balanceOf(whale);
 
+    // string memory message = string(
+    //   abi.encodePacked('Invalid delta on claimed rewards. Asset: ', string(abi.encodePacked(asset)))
+    // );
+
+    emit log_named_address('Asset', asset);
     assertApproxEqRel(
       balanceAfter - balanceBefore,
       expectedReward, // Approx estimated rewards with current emissions
-      0.08e18, // 8% delta
-      'Invalid delta on claimed rewards'
+      0.05e18, // 5% delta
+      'Invalid delta on claimed rewards.'
     );
 
     vm.stopPrank();

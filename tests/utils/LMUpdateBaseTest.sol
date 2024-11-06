@@ -10,13 +10,14 @@ import {IEmissionManager} from '../../src/interfaces/IEmissionManager.sol';
 
 abstract contract LMUpdateBaseTest is LMBaseTest {
   function test_setNewEmissionPerSecond() public {
-    NewEmissionPerAsset[] memory newEmissionsPerAsset = _getNewEmissionPerSecond();
+    NewEmissionPerAsset[] memory allNewEmissionsPerAsset = _getNewEmissionPerSecond();
     vm.startPrank(this.EMISSION_ADMIN());
 
     // The emission admin can change the emission per second of the reward after the rewards have been configured.
     // Here we change the initial emission per second to the new one.
-    for (uint i = 0; i < newEmissionsPerAsset.length; i++) {
-      NewEmissionPerAsset memory newEmissionPerAsset = newEmissionsPerAsset[i];
+    for (uint i = 0; i < allNewEmissionsPerAsset.length; i++) {
+      NewEmissionPerAsset memory newEmissionPerAsset = allNewEmissionsPerAsset[i];
+      // emit log_named_address('Asset', newEmissionPerAsset.asset);
       IEmissionManager(this.EMISSION_MANAGER()).setEmissionPerSecond(
         newEmissionPerAsset.asset,
         newEmissionPerAsset.rewards,

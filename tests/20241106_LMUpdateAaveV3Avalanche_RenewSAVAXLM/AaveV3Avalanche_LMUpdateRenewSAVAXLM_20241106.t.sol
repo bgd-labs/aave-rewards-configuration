@@ -20,10 +20,8 @@ contract AaveV3Avalanche_LMUpdateRenewSAVAXLM_20241106 is LMUpdateBaseTest {
     AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 52708885);
-  }
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 52710631);
 
-  function test_claimRewards() public {
     assets[0] = AaveV3AvalancheAssets.BTCb_A_TOKEN;
     assets[1] = AaveV3AvalancheAssets.USDC_A_TOKEN;
     assets[2] = AaveV3AvalancheAssets.USDt_A_TOKEN;
@@ -33,7 +31,9 @@ contract AaveV3Avalanche_LMUpdateRenewSAVAXLM_20241106 is LMUpdateBaseTest {
     assetsEmissions[1] = 1900 * 10 ** 18;
     assetsEmissions[2] = 900 * 10 ** 18;
     assetsEmissions[3] = 400 * 10 ** 18;
+  }
 
+  function test_claimRewards() public {
     address[] memory whales = new address[](ASSETS_COUNT);
     whales[0] = 0x7bBf8A8905b92fe5Dba6F50cD6b371e499091c79;
     whales[1] = 0x0f90Bbf994947399Ac83439707a083800fc42CBB;
@@ -41,10 +41,10 @@ contract AaveV3Avalanche_LMUpdateRenewSAVAXLM_20241106 is LMUpdateBaseTest {
     whales[3] = 0x9767d88f156040A24CacD1696D6E9E9e0A49006F;
 
     uint256[] memory whalesRewards = new uint256[](ASSETS_COUNT);
-    whalesRewards[0] = 18.45 * 10 ** 18; // 19.27 * 10 ** 18;
-    whalesRewards[1] = 18.45 * 10 ** 18;
-    whalesRewards[2] = 18 * 10 ** 18;
-    whalesRewards[3] = 18 * 10 ** 18;
+    whalesRewards[0] = 18 * 10 ** 18; // 1%
+    whalesRewards[1] = 19 * 10 ** 18; // 1%
+    whalesRewards[2] = 9 * 10 ** 18; // 1%
+    whalesRewards[3] = 4 * 10 ** 18; // 1%
 
     NewEmissionPerAsset[] memory allNewEmissionPerAssets = _getNewEmissionPerSecond();
     NewDistributionEndPerAsset[] memory allNewDistributionsEndPerAsset = _getNewDistributionEnd();
@@ -100,7 +100,11 @@ contract AaveV3Avalanche_LMUpdateRenewSAVAXLM_20241106 is LMUpdateBaseTest {
       newEmissionPerAsset.newEmissionsPerSecond = newEmissionsPerSecond;
 
       allNewEmissionPerAssets[i] = newEmissionPerAsset;
+
+      // emit log_named_address('allNewEmissionPerAssets[i].asset', allNewEmissionPerAssets[i].asset);
     }
+
+    // emit log_named_array('allNewEmissionPerAssets', allNewEmissionPerAssets);
 
     return allNewEmissionPerAssets;
   }
