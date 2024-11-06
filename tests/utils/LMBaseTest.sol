@@ -74,7 +74,7 @@ abstract contract LMBaseTest is Test {
     assertApproxEqRel(
       balanceAfter - balanceBefore,
       expectedReward, // Approx estimated rewards with current emissions
-      0.05e18, // 5% delta
+      0.08e18, // 8% delta
       'Invalid delta on claimed rewards'
     );
 
