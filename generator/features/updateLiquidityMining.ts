@@ -114,7 +114,6 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
         constants: [
           `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint256 public constant override NEW_TOTAL_DISTRIBUTION = ${cfg.rewardAmount} * 10 ** ${cfg.rewardTokenDecimals};`,
-          `address public constant override EMISSION_ADMIN = ${cfg.emissionsAdmin};`,
           `address public constant override EMISSION_MANAGER = ${pool}.EMISSION_MANAGER;`,
           `uint256 public constant NEW_DURATION_DISTRIBUTION_END = ${cfg.distributionEnd} days;`,
           `address public constant ${translateSupplyBorrowAssetToWhaleConstant(
@@ -125,21 +124,57 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
         ],
         fn: [
           `
-          function test_claimRewards() public {
+          function buildActions() public view returns (IPayloadsControllerCore.ExecutionAction[] memory) {
             NewEmissionPerAsset memory newEmissionPerAsset = _getNewEmissionPerSecond();
             NewDistributionEndPerAsset memory newDistributionEndPerAsset = _getNewDistributionEnd();
 
-            vm.startPrank(EMISSION_ADMIN);
-            IEmissionManager(${pool}.EMISSION_MANAGER).setEmissionPerSecond(
+            bytes memory newEmissionPerAssetUpdatePayload = abi.encodeWithSelector(
+              IEmissionManager.setEmissionPerSecond.selector,
               newEmissionPerAsset.asset,
               newEmissionPerAsset.rewards,
               newEmissionPerAsset.newEmissionsPerSecond
             );
-            IEmissionManager(${pool}.EMISSION_MANAGER).setDistributionEnd(
+
+            bytes memory newDistributionEndPerAssetUpdatePayload = abi.encodeWithSelector(
+              IEmissionManager.setDistributionEnd.selector,
               newDistributionEndPerAsset.asset,
               newDistributionEndPerAsset.reward,
               newDistributionEndPerAsset.newDistributionEnd
             );
+
+            IPayloadsControllerCore.ExecutionAction[]
+              memory executionActions = new IPayloadsControllerCore.ExecutionAction[](2);
+
+            for (uint256 i = 0; i < 2; i++) {
+              executionActions[i] = IPayloadsControllerCore.ExecutionAction({
+                target: ${pool}.EMISSION_MANAGER,
+                withDelegateCall: false,
+                accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+                value: 0,
+                signature: '',
+                callData: i == 0
+                  ? newEmissionPerAssetUpdatePayload
+                  : newDistributionEndPerAssetUpdatePayload
+              });
+            }
+
+            return executionActions;
+          }
+
+          function test_claimRewards() public {
+            address payloadsManager = permissionedPayloadsController.payloadsManager();
+
+            IPayloadsControllerCore.ExecutionAction[] memory actions = buildActions();
+
+            vm.prank(payloadsManager);
+            uint40 payloadId = permissionedPayloadsController.createPayload(actions);
+            uint40 delay = permissionedPayloadsController.getExecutorSettingsByAccessControl(
+               PayloadsControllerUtils.AccessControl.Level_1
+            ).delay;
+            // solium-disable-next-line
+            vm.warp(block.timestamp + delay + 1);
+
+            permissionedPayloadsController.executePayload(payloadId);
 
             _testClaimRewardsForWhale(
               ${translateSupplyBorrowAssetToWhaleConstant(cfg.asset, pool)},

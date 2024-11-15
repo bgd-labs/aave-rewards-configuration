@@ -54,6 +54,20 @@ export function prefixWithImports(code: string) {
   if (findMatch(code, 'IAaveIncentivesController')) {
     imports += `import {IAaveIncentivesController} from '../src/interfaces/IAaveIncentivesController.sol';\n`;
   }
+  if (findMatch(code, 'IOwnable')) {
+    imports += `import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';\n`;
+  }
+
+  if (findMatch(code, 'TransparentProxyFactory')) {
+    imports += `import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';\n`;
+  }
+  if (findMatch(code, 'Executor')) {
+    imports += `import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';\n`;
+  }
+
+  if (findMatch(code, 'PermissionedPayloadsController')) {
+    imports += `import {PermissionedPayloadsController, IPayloadsControllerCore, PayloadsControllerUtils, IPermissionedPayloadsController} from 'aave-governance-v3/contracts/payloads/PermissionedPayloadsController.sol';\n`;
+  }
 
   return imports + code;
 }
