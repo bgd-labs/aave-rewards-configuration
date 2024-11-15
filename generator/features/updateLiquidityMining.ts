@@ -166,13 +166,17 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
 
             IPayloadsControllerCore.ExecutionAction[] memory actions = buildActions();
 
+            uint40 initialTimestamp = uint40(block.timestamp);
+            uint40 delay = permissionedPayloadsController
+              .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
+              .delay;
+                
+            // solium-disable-next-line
+            vm.warp(initialTimestamp - delay - 1);
             vm.prank(payloadsManager);
             uint40 payloadId = permissionedPayloadsController.createPayload(actions);
-            uint40 delay = permissionedPayloadsController.getExecutorSettingsByAccessControl(
-               PayloadsControllerUtils.AccessControl.Level_1
-            ).delay;
             // solium-disable-next-line
-            vm.warp(block.timestamp + delay + 1);
+            vm.warp(initialTimestamp);
 
             permissionedPayloadsController.executePayload(payloadId);
 
