@@ -24,8 +24,6 @@ export const liquidityMiningUpdateTemplate = (
 
   const contract = `contract ${contractName} is LMUpdateBaseTest {
    ${constants}
-    
-   address public override EMISSION_ADMIN;
    IPermissionedPayloadsController internal permissionedPayloadsController;
 
    function setUp() public {

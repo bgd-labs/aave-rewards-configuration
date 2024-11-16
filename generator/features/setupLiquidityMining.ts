@@ -47,10 +47,12 @@ export async function fetchLiquidityMiningSetupParams({pool}): Promise<Liquidity
       : addressBook[pool].ASSETS[rewardToken].UNDERLYING;
     rewardToken = translateAssetToAssetLibUnderlying(rewardToken, pool);
   }
-  const emissionsAdmin = await addressPrompt({
-    message: 'Enter the address of the emissionsAdmin:',
-    required: true,
-  });
+  // todo: fetch executor address as emission admin
+  const emissionsAdmin = '0x0';
+  // const emissionsAdmin = await addressPrompt({
+  //   message: 'Enter the address of the emissionsAdmin:',
+  //   required: true,
+  // });
 
   const distributionEnd = await numberPromptInDays({
     message: 'Enter the total distribution time for the LM in days:',
@@ -130,7 +132,8 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
             : `address public constant override REWARD_ASSET = ${pool}Assets.${cfg.rewardToken}_UNDERLYING;`,
           `uint88 constant DURATION_DISTRIBUTION = ${cfg.distributionEnd} days;`,
           `uint256 public constant override TOTAL_DISTRIBUTION = ${cfg.totalReward} * 10 ** ${cfg.rewardTokenDecimals};`,
-          `address constant EMISSION_ADMIN = ${cfg.emissionsAdmin};\n`,
+          // todo: make constant after executor deployment
+          `address public override EMISSION_ADMIN;`,
           `address public constant override DEFAULT_INCENTIVES_CONTROLLER = ${pool}.DEFAULT_INCENTIVES_CONTROLLER;\n`,
           `ITransferStrategyBase public constant override TRANSFER_STRATEGY = ITransferStrategyBase(${cfg.transferStrategy});\n`,
           `IEACAggregatorProxy public constant override REWARD_ORACLE = IEACAggregatorProxy(${cfg.rewardOracle});\n`,

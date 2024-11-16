@@ -84,9 +84,11 @@ export async function fetchLiquidityMiningUpdateParams({pool}): Promise<Liquidit
     client: CHAIN_ID_CLIENT_MAP[chainId],
     address: addressBook[pool].EMISSION_MANAGER,
   });
-  const emissionsAdmin = (await emissionManagerContract.read.getEmissionAdmin([
-    rewardTokenAddress,
-  ])) as Address;
+  // todo: fetch executor address as emission admin
+  const emissionsAdmin = '0x0';
+  // const emissionsAdmin = (await emissionManagerContract.read.getEmissionAdmin([
+  //   rewardTokenAddress,
+  // ])) as Address;
 
   return {
     emissionsAdmin,
@@ -115,6 +117,8 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
           `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint256 public constant override NEW_TOTAL_DISTRIBUTION = ${cfg.rewardAmount} * 10 ** ${cfg.rewardTokenDecimals};`,
           `address public constant override EMISSION_MANAGER = ${pool}.EMISSION_MANAGER;`,
+          // todo: make constant after executor deployment
+          `address public override EMISSION_ADMIN;`,
           `uint256 public constant NEW_DURATION_DISTRIBUTION_END = ${cfg.distributionEnd} days;`,
           `address public constant ${translateSupplyBorrowAssetToWhaleConstant(
             cfg.asset,
