@@ -5,7 +5,7 @@ export const config: ConfigFile = {
     pool: 'AaveV3Ethereum',
     title: 'Renew USDS LM',
     shortName: 'RenewUSDSLM',
-    date: '20241113',
+    date: '20241118',
   },
   poolOptions: {
     AaveV3Ethereum: {
@@ -17,11 +17,11 @@ export const config: ConfigFile = {
           asset: 'USDS_aToken',
           distributionEnd: '7',
           rewardAmount: '245158',
-          whaleAddress: '0x18740A8020dC029B7b8156a7aF8Bd951B65029B0',
-          whaleExpectedReward: '2456.7',
+          whaleAddress: '0x77CaD933774FcB8F66c6FB34a382E15Bb88857Fe',
+          whaleExpectedReward: '2574.159',
         },
       },
-      cache: {blockNumber: 21173806},
+      cache: {blockNumber: 21214421},
     },
   },
 };

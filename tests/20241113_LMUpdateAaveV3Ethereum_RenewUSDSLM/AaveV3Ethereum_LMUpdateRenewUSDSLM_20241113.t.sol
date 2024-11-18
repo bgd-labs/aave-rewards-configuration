@@ -5,19 +5,19 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';
 import {LMUpdateBaseTest} from '../utils/LMUpdateBaseTest.sol';
 
-contract AaveV3Ethereum_LMUpdateRenewUSDSLM_20241113 is LMUpdateBaseTest {
+contract AaveV3Ethereum_LMUpdateRenewUSDSLM_20241118 is LMUpdateBaseTest {
   address public constant override REWARD_ASSET = AaveV3EthereumAssets.USDS_A_TOKEN;
   uint256 public constant override NEW_TOTAL_DISTRIBUTION = 245158 * 10 ** 18;
   address public constant override EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;
   address public constant override EMISSION_MANAGER = AaveV3Ethereum.EMISSION_MANAGER;
   uint256 public constant NEW_DURATION_DISTRIBUTION_END = 7 days;
-  address public constant aUSDS_WHALE = 0x18740A8020dC029B7b8156a7aF8Bd951B65029B0;
+  address public constant aUSDS_WHALE = 0x77CaD933774FcB8F66c6FB34a382E15Bb88857Fe;
 
   address public constant override DEFAULT_INCENTIVES_CONTROLLER =
     AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 21173806);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21214421);
   }
 
   function test_claimRewards() public {
@@ -40,7 +40,7 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM_20241113 is LMUpdateBaseTest {
       aUSDS_WHALE,
       AaveV3EthereumAssets.USDS_A_TOKEN,
       NEW_DURATION_DISTRIBUTION_END,
-      2456.7 * 10 ** 18
+      2574.159 * 10 ** 18 // 1.05%
     );
   }
 
