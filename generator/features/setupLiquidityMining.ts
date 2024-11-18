@@ -128,8 +128,8 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
       code: {
         constants: [
           cfg.rewardToken.includes('0x')
-            ? `address public constant override REWARD_ASSET = ${cfg.rewardToken};`
-            : `address public constant override REWARD_ASSET = ${pool}Assets.${cfg.rewardToken}_UNDERLYING;`,
+            ? `address public constant override REWARD_ASSET = ${pool}Assets.${cfg.rewardToken}_UNDERLYING;`
+            : `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint88 constant DURATION_DISTRIBUTION = ${cfg.distributionEnd} days;`,
           `uint256 public constant override TOTAL_DISTRIBUTION = ${cfg.totalReward} * 10 ** ${cfg.rewardTokenDecimals};`,
           // todo: make constant after executor deployment
