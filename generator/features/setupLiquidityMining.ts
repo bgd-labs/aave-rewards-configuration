@@ -133,7 +133,7 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           `uint88 constant DURATION_DISTRIBUTION = ${cfg.distributionEnd} days;`,
           `uint256 public constant override TOTAL_DISTRIBUTION = ${cfg.totalReward} * 10 ** ${cfg.rewardTokenDecimals};`,
           // todo: make constant after executor deployment
-          `address public override EMISSION_ADMIN;`,
+          `address public EMISSION_ADMIN;`,
           `address public constant override DEFAULT_INCENTIVES_CONTROLLER = ${pool}.DEFAULT_INCENTIVES_CONTROLLER;\n`,
           `ITransferStrategyBase public constant override TRANSFER_STRATEGY = ITransferStrategyBase(${cfg.transferStrategy});\n`,
           `IEACAggregatorProxy public constant override REWARD_ORACLE = IEACAggregatorProxy(${cfg.rewardOracle});\n`,
@@ -146,18 +146,38 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           }),
         ],
         fn: [
+          
           `
-          function test_activation() public {
-            vm.prank(EMISSION_ADMIN);
-            IEmissionManager(${pool}.EMISSION_MANAGER).configureAssets(_getAssetConfigs());
-
-            emit log_named_bytes(
-              'calldata to submit from Gnosis Safe',
-              abi.encodeWithSelector(
-                IEmissionManager(${pool}.EMISSION_MANAGER).configureAssets.selector,
-                _getAssetConfigs()
-              )
+          function buildActions() public view returns (IPayloadsControllerCore.ExecutionAction[] memory) {
+            IPayloadsControllerCore.ExecutionAction[]
+              memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
+            actions[0].target = AaveV3Polygon.EMISSION_MANAGER;
+            actions[0].accessLevel = PayloadsControllerUtils.AccessControl.Level_1;
+            actions[0].callData = abi.encodeWithSelector(
+              IEmissionManager.configureAssets.selector,
+              _getAssetConfigs()
             );
+            return actions;
+          }
+
+          function test_activation() public {
+            address payloadsManager = permissionedPayloadsController.payloadsManager();
+
+            IPayloadsControllerCore.ExecutionAction[] memory actions = buildActions();
+
+            uint40 initialTimestamp = uint40(block.timestamp);
+            uint40 delay = permissionedPayloadsController
+              .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
+              .delay;
+
+            // solium-disable-next-line
+            vm.warp(initialTimestamp - delay - 1);
+            vm.prank(payloadsManager);
+            uint40 payloadId = permissionedPayloadsController.createPayload(actions);
+            // solium-disable-next-line
+            vm.warp(initialTimestamp);
+
+            permissionedPayloadsController.executePayload(payloadId);
 
             ${cfg.assets
               .map(
