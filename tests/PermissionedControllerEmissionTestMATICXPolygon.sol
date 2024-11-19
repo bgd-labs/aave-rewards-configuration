@@ -28,7 +28,7 @@ contract PermissionedControllerEmissionTestMATICXPolygon is LMSetupBaseTest {
 
   IPermissionedPayloadsController internal permissionedPayloadsController;
 
-  function setUp() public {
+  function setUp() public virtual {
     vm.createSelectFork(vm.rpcUrl('polygon'), 60952423);
     Executor executor = new Executor();
 

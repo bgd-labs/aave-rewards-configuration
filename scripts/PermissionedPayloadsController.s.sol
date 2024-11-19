@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {EthereumScript} from "solidity-utils/contracts/utils/ScriptUtils.sol";
+import {Script} from "forge-std/Script.sol";
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
 import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {PermissionedPayloadsController, IPayloadsControllerCore, PayloadsControllerUtils, IPermissionedPayloadsController} from 'aave-governance-v3/contracts/payloads/PermissionedPayloadsController.sol';
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
 import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
 
-contract PermissionedPayloadsControllerDeploy is EthereumScript {
-  function run() public broadcast {
-    address owner = vm.addr(123);
+contract PermissionedPayloadsControllerDeploy is Script {
+  function run() public {
+    address owner = 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65;
     address proxyOwner = vm.addr(456);
+    vm.startBroadcast();
     Executor executor = new Executor();
     
     IPayloadsControllerCore.UpdateExecutorInput[]
@@ -38,6 +39,7 @@ contract PermissionedPayloadsControllerDeploy is EthereumScript {
     );
 
     IOwnable(address(executor)).transferOwnership(address(permissionedPayloadsController));
+    vm.stopBroadcast();
 
   }
 }
