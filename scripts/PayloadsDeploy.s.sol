@@ -5,13 +5,14 @@ import {PermissionedControllerEmissionTestMATICXPolygon, IPermissionedPayloadsCo
 import {Script} from 'forge-std/Script.sol';
 
 contract PayloadsDeploy is PermissionedControllerEmissionTestMATICXPolygon, Script {
+  // solium-disable-next-line
   function setUp() public override {}
 
   function run() public {
-    uint256 ownerKey = 0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a;
-    address controller = 0x75537828f2ce51be7289709686A69CbFDbB714F1;
+    // todo: specify address when permissioned payloads controller will be deployed
+    address controller;
     IPermissionedPayloadsController.ExecutionAction[] memory actions = buildActions();
-    vm.startBroadcast(ownerKey);
+    vm.startBroadcast();
     IPermissionedPayloadsController(controller).createPayload(actions);
     vm.stopBroadcast();
   }
