@@ -63,7 +63,6 @@ abstract contract LMUpdateBaseTest is LMBaseTest {
   function test_rewardsVaultHasSufficientBalance() public {
     address transferStrategy = IAaveIncentivesController(this.DEFAULT_INCENTIVES_CONTROLLER())
       .getTransferStrategy(this.REWARD_ASSET());
-    emit log_named_address('===> transferStrategy', transferStrategy);
     address rewardsVault = ITransferStrategyBase(transferStrategy).getRewardsVault();
     uint256 balance = IERC20(this.REWARD_ASSET()).balanceOf(rewardsVault);
 
