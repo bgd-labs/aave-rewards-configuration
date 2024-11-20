@@ -73,4 +73,5 @@ export interface PoolConfig {
 export type Files = {
   jsonConfig: string;
   payloadTest: {pool: PoolIdentifier; payloadTest: string; contractName: string};
+  payloadDeployment: {payloadDeployment: string, scriptName: string};
 };

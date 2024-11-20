@@ -26,7 +26,7 @@ export const liquidityMiningUpdateTemplate = (
    ${constants}
    IPermissionedPayloadsController internal permissionedPayloadsController;
 
-   function setUp() public {
+   function setUp() public virtual {
      vm.createSelectFork(vm.rpcUrl('${getChainAlias(chain)}'), ${poolConfig.cache.blockNumber});
      Executor executor = new Executor();
 
