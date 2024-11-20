@@ -47,7 +47,6 @@ contract PermissionedControllerEmissionTestMATICXPolygon is LMSetupBaseTest {
         address(728),
         abi.encodeWithSelector(
           IPermissionedPayloadsController.initialize.selector,
-          address(415),
           address(490),
           address(659),
           executorInput
