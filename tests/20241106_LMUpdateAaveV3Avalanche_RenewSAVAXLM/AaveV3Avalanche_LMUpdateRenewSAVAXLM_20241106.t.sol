@@ -20,7 +20,7 @@ contract AaveV3Avalanche_LMUpdateRenewSAVAXLM_20241106 is LMUpdateBaseTest {
     AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 52710631);
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 53343809);
 
     assets[0] = AaveV3AvalancheAssets.BTCb_A_TOKEN;
     assets[1] = AaveV3AvalancheAssets.USDC_A_TOKEN;
@@ -35,29 +35,29 @@ contract AaveV3Avalanche_LMUpdateRenewSAVAXLM_20241106 is LMUpdateBaseTest {
 
   function test_claimRewards() public {
     address[] memory whales = new address[](ASSETS_COUNT);
-    whales[0] = 0x7bBf8A8905b92fe5Dba6F50cD6b371e499091c79;
-    whales[1] = 0x0f90Bbf994947399Ac83439707a083800fc42CBB;
-    whales[2] = 0x854839Fdb982E7048aBf4aA4a070e113ff70D72D;
-    whales[3] = 0x9767d88f156040A24CacD1696D6E9E9e0A49006F;
+    whales[0] = 0x62824cEE52da61449023F3a7cFDfAdD3e74Dd22E;
+    whales[1] = 0xE47de2a72eE216F09612b81c116b5B71112b753d;
+    whales[2] = 0xF82534fE81f19203160858F3503bf34639686994;
+    whales[3] = 0xB587AA8272Ff43220633fFfDC80a4D9d0C9a3E17;
 
     uint256[] memory whalesRewards = new uint256[](ASSETS_COUNT);
-    whalesRewards[0] = 18 * 10 ** 18; // 1%
+    whalesRewards[0] = 18 * 10 ** 18; // 1% (0.97%)
     whalesRewards[1] = 19 * 10 ** 18; // 1%
     whalesRewards[2] = 9 * 10 ** 18; // 1%
     whalesRewards[3] = 4 * 10 ** 18; // 1%
 
-    NewEmissionPerAsset[] memory allNewEmissionPerAssets = _getNewEmissionPerSecond();
+    // NewEmissionPerAsset[] memory allNewEmissionPerAssets = _getNewEmissionPerSecond();
     NewDistributionEndPerAsset[] memory allNewDistributionsEndPerAsset = _getNewDistributionEnd();
 
     vm.startPrank(EMISSION_ADMIN);
-    for (uint256 i = 0; i < allNewEmissionPerAssets.length; i++) {
-      NewEmissionPerAsset memory newEmissionPerAsset = allNewEmissionPerAssets[i];
-      IEmissionManager(AaveV3Avalanche.EMISSION_MANAGER).setEmissionPerSecond(
-        newEmissionPerAsset.asset,
-        newEmissionPerAsset.rewards,
-        newEmissionPerAsset.newEmissionsPerSecond
-      );
-    }
+    // for (uint256 i = 0; i < allNewEmissionPerAssets.length; i++) {
+    //   NewEmissionPerAsset memory newEmissionPerAsset = allNewEmissionPerAssets[i];
+    //   IEmissionManager(AaveV3Avalanche.EMISSION_MANAGER).setEmissionPerSecond(
+    //     newEmissionPerAsset.asset,
+    //     newEmissionPerAsset.rewards,
+    //     newEmissionPerAsset.newEmissionsPerSecond
+    //   );
+    // }
 
     for (uint256 i = 0; i < allNewDistributionsEndPerAsset.length; i++) {
       NewDistributionEndPerAsset memory newDistributionEndPerAsset = allNewDistributionsEndPerAsset[
