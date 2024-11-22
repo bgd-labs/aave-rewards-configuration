@@ -42,7 +42,7 @@ This repository contains:
    }])
    ```
 
-Below is an example with the pseudo code to activate Liquidity Mining for the variable borrow of `wMatic` with `MaticX` as the reward token for the total amount of `60,000` `MaticX` for the total duration of `6 months`. For a more detailed explanation checkout this [test](./tests/EmissionTestMATICXPolygon.t.sol).
+Below is an example with the pseudo code to activate Liquidity Mining for the variable borrow of `wMatic` with `MaticX` as the reward token for the total amount of `60,000` `MaticX` for the total duration of `6 months`. For a more detailed explanation checkout this [test](./tests/PermissionedControllerEmissionTestMATICXPolygon.t.sol).
 
 1. Make sure the Rewards Vault has sufficient balance of the MaticX token.
 
@@ -78,22 +78,15 @@ Below is an example with the pseudo code to activate Liquidity Mining for the va
    }])
    ```
 
-## How to modify emissions of the LM program?
+## How to create LM emissions configuration request?
 
-The function `_getEmissionsPerAsset()` on [EmissionTestOpOptimism.t.sol](./tests/EmissionTestOpOptimism.t.sol) defines the exact emissions for the particular case of $OP as reward token and a total distribution of 5'000'000 $OP during exactly 90 days.
-The emissions can be modified there, with the only requirement being that `sum(all-emissions) == TOTAL_DISTRIBUTION`
+The Emissions Manager's `configureAssets` function is responsible for creating a new liquidity mining program, while the functions `setEmissionPerSecond()` and `setDistributionEnd()` are for configuring an existing one. These functions can only be called via the PermissionedPayloadsController. You need to submit an encoded Emission Manager function call with arguments into the PermissionedPayloadsController's `createPayload` function. The `createPayload` function can only be called by an account with the *payloads manager* role.
 
-You can run the test via `forge test -vv` which will emit the selector encoded calldata for `configureAssets` on the emission admin which you can use to execute the configuration changes e.g. via Safe.
+This repository includes a generator to help you bootstrap the required files for an emission configuration. To generate an LM configuration proposal, you need to run `npm run generate`.
 
-_Note: The test example above uses total distribution and duration distribution just for convenience to define emissions per second, in reality as we only pass emissions per second to `configureAssets()` we could define it in any way we wish._
+To get a full list of available commands, run `npm run generate -- --help`.
 
-## How to configure emissions after the LM program has been created?
-
-After the LM program has been created, the emissions per second and the distribution end could be changed later on by the emissions admin to reduce the LM rewards or change the end date for the distribution. This can be done by calling `setEmissionPerSecond()` and `setDistributionEnd()` on the Emission Manager contract. The test examples on [EmissionConfigurationTestMATICXPolygon.t.sol](./tests/EmissionConfigurationTestMATICXPolygon.t.sol) shows how to do so.
-
-The function `_getNewEmissionPerSecond()` and `_getNewDistributionEnd()` defines the new emissions per second and new distribution end for the particular case, which could be modified there to change to modified emissions per second and distribution end.
-
-Similarly you can also run the test via `forge test -vv` which will emit the selector encoded calldata for `setEmissionPerSecond` and `setDistributionEnd` which can be used to make the configuration changes.
+We also provide a script to test and deploy LM configurations created with the generator. You can find it in the generated files.
 
 ## FAQ's:
 
