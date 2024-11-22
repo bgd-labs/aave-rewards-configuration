@@ -22,7 +22,12 @@ export const liquidityMiningSetupTemplate = (
     .filter((f) => f !== undefined)
     .join('\n');
 
-  const contract = `contract ${contractName} is LMSetupBaseTest {
+  const contract = `
+  /**
+  * @dev Test for ${contractName}
+  * command: forge test --mc ${contractName} -vv
+  */
+  contract ${contractName} is LMSetupBaseTest {
    ${constants}
 
    IPermissionedPayloadsController internal permissionedPayloadsController;
@@ -46,7 +51,6 @@ export const liquidityMiningSetupTemplate = (
         address(728),
         abi.encodeWithSelector(
           IPermissionedPayloadsController.initialize.selector,
-          address(415),
           address(490),
           address(659),
           executorInput

@@ -1,4 +1,4 @@
-import {generateContractName, getPoolChain, getChainAlias} from '../common';
+import {generateContractName, getPoolChain, getChainAlias, generateFolderName} from '../common';
 import {Options, PoolConfig, PoolIdentifier} from '../types';
 import {prefixWithImports} from '../utils/importsResolver';
 import {prefixWithPragma} from '../utils/constants';
@@ -22,7 +22,12 @@ export const liquidityMiningUpdateTemplate = (
     .filter((f) => f !== undefined)
     .join('\n');
 
-  const contract = `contract ${contractName} is LMUpdateBaseTest {
+  const contract = `
+  /**
+  * @dev Test for ${contractName}
+  * command: forge test --mc ${contractName} -vv
+  */
+  contract ${contractName} is LMUpdateBaseTest {
    ${constants}
    IPermissionedPayloadsController internal permissionedPayloadsController;
 
@@ -45,7 +50,6 @@ export const liquidityMiningUpdateTemplate = (
          address(728),
          abi.encodeWithSelector(
            IPermissionedPayloadsController.initialize.selector,
-           address(415),
            address(490),
            address(659),
            executorInput

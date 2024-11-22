@@ -51,11 +51,7 @@ export async function generateFiles(options: Options, poolConfigs: PoolConfigs):
 
   async function createPayloadDeployment(options: Options, pool: PoolIdentifier) {
     const scriptName = generateScriptName(options, pool);
-    const code = liquidityMiningPayloadDeploymentTemplate(
-      getPoolChain(pool),
-      contractName,
-      scriptName
-    );
+    const code = liquidityMiningPayloadDeploymentTemplate(options);
     return {
       payloadDeployment: await prettier.format(code, {
         ...prettierSolCfg,
