@@ -15,7 +15,7 @@ contract ${scriptName} is ${testContractName}, ${poolChain}Script {
   // solium-disable-next-line
   function setUp() public override {}
 
-  // todo: specify address when permissioned payloads controller will be deployed
+  // todo: once the new payloadsController deployed, it'll be added to the address book and imported here without function param
   function run(address controller) public {
     IPermissionedPayloadsController.ExecutionAction[] memory actions = buildActions();
     vm.startBroadcast();
