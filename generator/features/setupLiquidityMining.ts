@@ -151,7 +151,7 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           function buildActions() public view returns (IPayloadsControllerCore.ExecutionAction[] memory) {
             IPayloadsControllerCore.ExecutionAction[]
               memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
-            actions[0].target = AaveV3Polygon.EMISSION_MANAGER;
+            actions[0].target = ${pool}.EMISSION_MANAGER;
             actions[0].accessLevel = PayloadsControllerUtils.AccessControl.Level_1;
             actions[0].callData = abi.encodeWithSelector(
               IEmissionManager.configureAssets.selector,
