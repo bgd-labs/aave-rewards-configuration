@@ -10,7 +10,7 @@ contract AaveV3EthereumLido_LMUpdateRenewAWETHLM_20241129 is LMUpdateBaseTest {
   uint256 public constant override NEW_TOTAL_DISTRIBUTION = 93.5 * 10 ** 18;
   address public constant override EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;
   address public constant override EMISSION_MANAGER = AaveV3EthereumLido.EMISSION_MANAGER;
-  uint256 public constant NEW_DURATION_DISTRIBUTION_END = 17 days;
+  uint256 public constant NEW_DURATION_DISTRIBUTION_END = 16 days;
   address public constant aWETH_WHALE = 0x4A3322919b613781151aB84bBCe2D4520Bc51bCD;
 
   address public constant override DEFAULT_INCENTIVES_CONTROLLER =
