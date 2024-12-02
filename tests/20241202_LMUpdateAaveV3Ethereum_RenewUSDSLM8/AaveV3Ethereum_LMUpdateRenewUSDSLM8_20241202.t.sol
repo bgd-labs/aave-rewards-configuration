@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';
+import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy, IRewardsController} from '../../src/interfaces/IEmissionManager.sol';
 import {LMUpdateBaseTest} from '../utils/LMUpdateBaseTest.sol';
 
 contract AaveV3Ethereum_LMUpdateRenewUSDSLM8_20241202 is LMUpdateBaseTest {
@@ -70,7 +70,10 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM8_20241202 is LMUpdateBaseTest {
     newDistributionEndPerAsset.asset = AaveV3EthereumAssets.USDS_A_TOKEN;
     newDistributionEndPerAsset.reward = REWARD_ASSET;
     newDistributionEndPerAsset.newDistributionEnd = _toUint32(
-      block.timestamp + NEW_DURATION_DISTRIBUTION_END
+      IRewardsController(AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER).getDistributionEnd(
+        newDistributionEndPerAsset.asset,
+        newDistributionEndPerAsset.reward
+      ) + NEW_DURATION_DISTRIBUTION_END
     );
 
     return newDistributionEndPerAsset;
