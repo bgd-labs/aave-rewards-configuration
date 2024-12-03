@@ -16,7 +16,6 @@ contract EmissionMATICXPolygonConfigurationDeploy is
   // solium-disable-next-line
   function setUp() public override {}
 
-  // todo: once the new payloadsController deployed, it'll be added to the address book and imported here without function param
   function run() public {
     IPermissionedPayloadsController.ExecutionAction[] memory actions = buildActions();
     vm.startBroadcast();

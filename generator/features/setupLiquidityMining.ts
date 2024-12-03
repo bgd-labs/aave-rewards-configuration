@@ -47,12 +47,6 @@ export async function fetchLiquidityMiningSetupParams({pool}): Promise<Liquidity
       : addressBook[pool].ASSETS[rewardToken].UNDERLYING;
     rewardToken = translateAssetToAssetLibUnderlying(rewardToken, pool);
   }
-  // todo: fetch executor address as emission admin
-  const emissionsAdmin = '0x0';
-  // const emissionsAdmin = await addressPrompt({
-  //   message: 'Enter the address of the emissionsAdmin:',
-  //   required: true,
-  // });
 
   const distributionEnd = await numberPromptInDays({
     message: 'Enter the total distribution time for the LM in days:',
@@ -101,7 +95,6 @@ export async function fetchLiquidityMiningSetupParams({pool}): Promise<Liquidity
   }
 
   return {
-    emissionsAdmin,
     rewardToken,
     rewardTokenDecimals,
     rewardOracle,
@@ -130,9 +123,8 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint88 constant DURATION_DISTRIBUTION = ${cfg.distributionEnd} days;`,
           `uint256 public constant override TOTAL_DISTRIBUTION = ${cfg.totalReward} * 10 ** ${cfg.rewardTokenDecimals};`,
-          // todo: make constant after executor deployment
-          `address public EMISSION_ADMIN;`,
           `address public constant override DEFAULT_INCENTIVES_CONTROLLER = ${pool}.DEFAULT_INCENTIVES_CONTROLLER;\n`,
+          `IPermissionedPayloadsController public constant PAYLOADS_CONTROLLER = ${pool}.PAYLOADS_CONTROLLER;`,
           `ITransferStrategyBase public constant override TRANSFER_STRATEGY = ITransferStrategyBase(${cfg.transferStrategy});\n`,
           `IEACAggregatorProxy public constant override REWARD_ORACLE = IEACAggregatorProxy(${cfg.rewardOracle});\n`,
           ...cfg.assets.map((asset, index) => {
@@ -159,23 +151,23 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           }
 
           function test_activation() public {
-            address payloadsManager = permissionedPayloadsController.payloadsManager();
+            address payloadsManager = PAYLOADS_CONTROLLER.payloadsManager();
 
             IPayloadsControllerCore.ExecutionAction[] memory actions = buildActions();
 
             uint40 initialTimestamp = uint40(block.timestamp);
-            uint40 delay = permissionedPayloadsController
+            uint40 delay = PAYLOADS_CONTROLLER
               .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
               .delay;
 
             // solium-disable-next-line
             vm.warp(initialTimestamp - delay - 1);
             vm.prank(payloadsManager);
-            uint40 payloadId = permissionedPayloadsController.createPayload(actions);
+            uint40 payloadId = PAYLOADS_CONTROLLER.createPayload(actions);
             // solium-disable-next-line
             vm.warp(initialTimestamp);
 
-            permissionedPayloadsController.executePayload(payloadId);
+            PAYLOADS_CONTROLLER.executePayload(payloadId);
 
             ${cfg.assets
               .map(

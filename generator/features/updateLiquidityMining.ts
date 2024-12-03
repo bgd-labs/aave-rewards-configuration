@@ -117,8 +117,8 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
           `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint256 public constant override NEW_TOTAL_DISTRIBUTION = ${cfg.rewardAmount} * 10 ** ${cfg.rewardTokenDecimals};`,
           `address public constant override EMISSION_MANAGER = ${pool}.EMISSION_MANAGER;`,
-          // todo: make constant after executor deployment
-          `address public override EMISSION_ADMIN;`,
+          `IPermissionedPayloadsController public constant PAYLOADS_CONTROLLER = ${pool}.PAYLOADS_CONTROLLER;`,
+          `address public override EMISSION_ADMIN = ${cfg.emissionsAdmin};`,
           `uint256 public constant NEW_DURATION_DISTRIBUTION_END = ${cfg.distributionEnd} days;`,
           `address public constant ${translateSupplyBorrowAssetToWhaleConstant(
             cfg.asset,
@@ -166,23 +166,23 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
           }
 
           function test_claimRewards() public {
-            address payloadsManager = permissionedPayloadsController.payloadsManager();
+            address payloadsManager = PAYLOADS_CONTROLLER.payloadsManager();
 
             IPayloadsControllerCore.ExecutionAction[] memory actions = buildActions();
 
             uint40 initialTimestamp = uint40(block.timestamp);
-            uint40 delay = permissionedPayloadsController
+            uint40 delay = PAYLOADS_CONTROLLER
               .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
               .delay;
                 
             // solium-disable-next-line
             vm.warp(initialTimestamp - delay - 1);
             vm.prank(payloadsManager);
-            uint40 payloadId = permissionedPayloadsController.createPayload(actions);
+            uint40 payloadId = PAYLOADS_CONTROLLER.createPayload(actions);
             // solium-disable-next-line
             vm.warp(initialTimestamp);
 
-            permissionedPayloadsController.executePayload(payloadId);
+            PAYLOADS_CONTROLLER.executePayload(payloadId);
 
             _testClaimRewardsForWhale(
               ${translateSupplyBorrowAssetToWhaleConstant(cfg.asset, pool)},

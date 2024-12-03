@@ -22,17 +22,16 @@ import {${poolChain}Script} from '../../lib/aave-address-book/lib/aave-v3-origin
 
 /**
  * @dev Deploy ${poolChain} 
- * deploy-command: make deploy-ledger contract=tests/${folderName}/${scriptName}.s.sol:${scriptName} chain=${chainAlias} args="-s \\"run(address)\\" \${PERMISSIONED_PAYLOADS_CONTROLLER_ADDRESS}"
+ * deploy-command: make deploy-ledger contract=tests/${folderName}/${scriptName}.s.sol:${scriptName} chain=${chainAlias}
  */
 contract ${scriptName} is ${testContractName}, ${poolChain}Script {
   // solium-disable-next-line
   function setUp() public override {}
 
-  // todo: once the new payloadsController deployed, it'll be added to the address book and imported here without function param
-  function run(address controller) public {
+  function run() public {
     IPermissionedPayloadsController.ExecutionAction[] memory actions = buildActions();
     vm.startBroadcast();
-    IPermissionedPayloadsController(controller).createPayload(actions);
+    PAYLOADS_CONTROLLER.createPayload(actions);
     vm.stopBroadcast();
   }
 }
