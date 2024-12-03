@@ -84,11 +84,9 @@ export async function fetchLiquidityMiningUpdateParams({pool}): Promise<Liquidit
     client: CHAIN_ID_CLIENT_MAP[chainId],
     address: addressBook[pool].EMISSION_MANAGER,
   });
-  // todo: fetch executor address as emission admin
-  const emissionsAdmin = '0x0';
-  // const emissionsAdmin = (await emissionManagerContract.read.getEmissionAdmin([
-  //   rewardTokenAddress,
-  // ])) as Address;
+  const emissionsAdmin = (await emissionManagerContract.read.getEmissionAdmin([
+    rewardTokenAddress,
+  ])) as Address;
 
   return {
     emissionsAdmin,
