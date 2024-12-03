@@ -23,7 +23,6 @@ import {${poolChain}Script} from '../../lib/aave-address-book/lib/aave-v3-origin
 /**
  * @dev Deploy ${poolChain} 
  * deploy-command: make deploy-ledger contract=tests/${folderName}/${scriptName}.s.sol:${scriptName} chain=${chainAlias} args="-s \\"run(address)\\" \${PERMISSIONED_PAYLOADS_CONTROLLER_ADDRESS}"
- * verify-command: npx catapulta-verify -b broadcast/${scriptName}.s.sol/${chainId}/run-latest.json
  */
 contract ${scriptName} is ${testContractName}, ${poolChain}Script {
   // solium-disable-next-line
