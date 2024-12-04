@@ -22,7 +22,10 @@ import {${poolChain}Script} from '../../lib/aave-address-book/lib/aave-v3-origin
 
 /**
  * @dev Deploy ${poolChain} 
- * deploy-command: make deploy-ledger contract=tests/${folderName}/${scriptName}.s.sol:${scriptName} chain=${chainAlias}
+ * deploy-command:
+ * make deploy-ledger contract=tests/${folderName}/${scriptName}.s.sol:${scriptName} chain=${chainAlias}
+ * or
+ * make deploy-private-key contract=tests/${folderName}/${scriptName}.s.sol:${scriptName} chain=${chainAlias} private_key=$\{PRIVATE_KEY\}
  */
 contract ${scriptName} is ${testContractName}, ${poolChain}Script {
   // solium-disable-next-line
