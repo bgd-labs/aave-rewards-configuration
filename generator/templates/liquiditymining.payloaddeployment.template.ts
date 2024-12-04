@@ -9,7 +9,6 @@ export const liquidityMiningPayloadDeploymentTemplate = (
   const scriptName = generateScriptName(options, options.pool);
   const chainAlias = getChainAlias(poolChain);
   const folderName = generateFolderName(options);
-  const chainId = CHAIN_TO_CHAIN_ID[poolChain];
 
   return`
   // SPDX-License-Identifier: MIT
