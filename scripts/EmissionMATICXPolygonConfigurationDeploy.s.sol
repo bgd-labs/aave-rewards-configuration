@@ -3,15 +3,23 @@ pragma solidity ^0.8.0;
 
 import {IPermissionedPayloadsController} from 'aave-address-book/governance-v3/IPermissionedPayloadsController.sol';
 import {PermissionedControllerEmissionTestMATICXPolygon} from '../tests/PermissionedControllerEmissionTestMATICXPolygon.t.sol';
-import {PolygonScript} from '../../lib/aave-address-book/lib/aave-v3-origin/lib/solidity-utils/src/contracts/utils/ScriptUtils.sol';
+import {Script} from 'forge-std/Script.sol';
 
 /**
  * @dev Deploy Polygon
- * deploy-command: make deploy-ledger contract=scripts/EmissionMATICXPolygonConfigurationDeploy.s.sol chain=polygon args="-s \"run(address)\" ${PERMISSIONED_PAYLOADS_CONTROLLER_ADDRESS}"
+ * deploy-command: make deploy-ledger contract=scripts/EmissionMATICXPolygonConfigurationDeploy.s.sol chain=polygon
+ */
+
+/**
+ * @dev Deploy Polygon
+ * deploy-command:
+ * make deploy-ledger contract=scripts/EmissionMATICXPolygonConfigurationDeploy.s.sol chain=polygon
+ * or
+ * make deploy-private-key contract=scripts/EmissionMATICXPolygonConfigurationDeploy.s.sol chain=polygon private_key=$\{PRIVATE_KEY\}
  */
 contract EmissionMATICXPolygonConfigurationDeploy is
   PermissionedControllerEmissionTestMATICXPolygon,
-  PolygonScript
+  Script
 {
   // solium-disable-next-line
   function setUp() public override {}
