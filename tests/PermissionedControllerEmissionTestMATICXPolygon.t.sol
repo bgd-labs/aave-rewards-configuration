@@ -137,7 +137,7 @@ contract PermissionedControllerEmissionTestMATICXPolygon is LMSetupBaseTest {
     PAYLOADS_CONTROLLER = IPermissionedPayloadsController(
       proxyFactory.create(
         address(permissionedPayloadsControllerImpl),
-        address(728),
+        ProxyAdmin(address(728)),
         abi.encodeWithSelector(
           IPermissionedPayloadsController.initialize.selector,
           address(490),
