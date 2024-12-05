@@ -11,6 +11,8 @@ test   :; forge test -vvv
 test-sd-rewards :; forge test -vvv --match-contract EmissionTestSDPolygon
 test-stmatic-rewards :; forge test -vvv --match-contract EmissionTestSTMATICPolygon
 test-maticx-rewards :; forge test -vvv --match-contract EmissionTestMATICXPolygon
+deploy-ledger :; forge script ${contract} --rpc-url ${chain}  --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} -vvvv --slow --broadcast
+deploy-private-key :; forge script ${contract} --rpc-url ${chain} --private-key ${private_key} -vvvv --slow --broadcast
 
 # scripts
 deploy-sd-transfer-strategy :;  forge script scripts/RewardsConfigHelpers.s.sol:SDDeployTransferStrategy --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv

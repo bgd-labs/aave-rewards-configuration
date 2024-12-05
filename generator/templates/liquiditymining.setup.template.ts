@@ -22,10 +22,15 @@ export const liquidityMiningSetupTemplate = (
     .filter((f) => f !== undefined)
     .join('\n');
 
-  const contract = `contract ${contractName} is LMSetupBaseTest {
+  const contract = `
+  /**
+  * @dev Test for ${contractName}
+  * command: forge test --mc ${contractName} -vv
+  */
+  contract ${contractName} is LMSetupBaseTest {
    ${constants}
 
-   function setUp() public {
+   function setUp() public virtual {
     vm.createSelectFork(vm.rpcUrl('${getChainAlias(chain)}'), ${poolConfig.cache.blockNumber});
    }
 

@@ -1,7 +1,6 @@
 import {Hex} from 'viem';
 
 export interface LiquidityMiningSetup {
-  emissionsAdmin: Hex;
   rewardToken: string;
   rewardTokenDecimals: number;
   rewardOracle: string;

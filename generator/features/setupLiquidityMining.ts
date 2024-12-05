@@ -47,10 +47,6 @@ export async function fetchLiquidityMiningSetupParams({pool}): Promise<Liquidity
       : addressBook[pool].ASSETS[rewardToken].UNDERLYING;
     rewardToken = translateAssetToAssetLibUnderlying(rewardToken, pool);
   }
-  const emissionsAdmin = await addressPrompt({
-    message: 'Enter the address of the emissionsAdmin:',
-    required: true,
-  });
 
   const distributionEnd = await numberPromptInDays({
     message: 'Enter the total distribution time for the LM in days:',
@@ -99,7 +95,6 @@ export async function fetchLiquidityMiningSetupParams({pool}): Promise<Liquidity
   }
 
   return {
-    emissionsAdmin,
     rewardToken,
     rewardTokenDecimals,
     rewardOracle,
@@ -125,13 +120,11 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
     const response: CodeArtifact = {
       code: {
         constants: [
-          cfg.rewardToken.includes('0x')
-            ? `address public constant override REWARD_ASSET = ${cfg.rewardToken};`
-            : `address public constant override REWARD_ASSET = ${pool}Assets.${cfg.rewardToken}_UNDERLYING;`,
+          `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint88 constant DURATION_DISTRIBUTION = ${cfg.distributionEnd} days;`,
           `uint256 public constant override TOTAL_DISTRIBUTION = ${cfg.totalReward} * 10 ** ${cfg.rewardTokenDecimals};`,
-          `address constant EMISSION_ADMIN = ${cfg.emissionsAdmin};\n`,
           `address public constant override DEFAULT_INCENTIVES_CONTROLLER = ${pool}.DEFAULT_INCENTIVES_CONTROLLER;\n`,
+          `IPermissionedPayloadsController public constant PAYLOADS_CONTROLLER = ${pool}.PAYLOADS_CONTROLLER;`,
           `ITransferStrategyBase public constant override TRANSFER_STRATEGY = ITransferStrategyBase(${cfg.transferStrategy});\n`,
           `IEACAggregatorProxy public constant override REWARD_ORACLE = IEACAggregatorProxy(${cfg.rewardOracle});\n`,
           ...cfg.assets.map((asset, index) => {
@@ -143,18 +136,38 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           }),
         ],
         fn: [
+          
           `
-          function test_activation() public {
-            vm.prank(EMISSION_ADMIN);
-            IEmissionManager(${pool}.EMISSION_MANAGER).configureAssets(_getAssetConfigs());
-
-            emit log_named_bytes(
-              'calldata to submit from Gnosis Safe',
-              abi.encodeWithSelector(
-                IEmissionManager(${pool}.EMISSION_MANAGER).configureAssets.selector,
-                _getAssetConfigs()
-              )
+          function buildActions() public view returns (IPayloadsControllerCore.ExecutionAction[] memory) {
+            IPayloadsControllerCore.ExecutionAction[]
+              memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
+            actions[0].target = ${pool}.EMISSION_MANAGER;
+            actions[0].accessLevel = PayloadsControllerUtils.AccessControl.Level_1;
+            actions[0].callData = abi.encodeWithSelector(
+              IEmissionManager.configureAssets.selector,
+              _getAssetConfigs()
             );
+            return actions;
+          }
+
+          function test_activation() public {
+            address payloadsManager = PAYLOADS_CONTROLLER.payloadsManager();
+
+            IPayloadsControllerCore.ExecutionAction[] memory actions = buildActions();
+
+            uint40 initialTimestamp = uint40(block.timestamp);
+            uint40 delay = PAYLOADS_CONTROLLER
+              .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
+              .delay;
+
+            // solium-disable-next-line
+            vm.warp(initialTimestamp - delay - 1);
+            vm.prank(payloadsManager);
+            uint40 payloadId = PAYLOADS_CONTROLLER.createPayload(actions);
+            // solium-disable-next-line
+            vm.warp(initialTimestamp);
+
+            PAYLOADS_CONTROLLER.executePayload(payloadId);
 
             ${cfg.assets
               .map(

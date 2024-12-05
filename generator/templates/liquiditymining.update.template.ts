@@ -1,4 +1,4 @@
-import {generateContractName, getPoolChain, getChainAlias} from '../common';
+import {generateContractName, getPoolChain, getChainAlias, generateFolderName} from '../common';
 import {Options, PoolConfig, PoolIdentifier} from '../types';
 import {prefixWithImports} from '../utils/importsResolver';
 import {prefixWithPragma} from '../utils/constants';
@@ -22,15 +22,20 @@ export const liquidityMiningUpdateTemplate = (
     .filter((f) => f !== undefined)
     .join('\n');
 
-  const contract = `contract ${contractName} is LMUpdateBaseTest {
+  const contract = `
+  /**
+  * @dev Test for ${contractName}
+  * command: forge test --mc ${contractName} -vv
+  */
+  contract ${contractName} is LMUpdateBaseTest {
    ${constants}
 
-   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('${getChainAlias(chain)}'), ${poolConfig.cache.blockNumber});
+   function setUp() public virtual {
+     vm.createSelectFork(vm.rpcUrl('${getChainAlias(chain)}'), ${poolConfig.cache.blockNumber});
    }
 
    ${functions}
-  }`;
+   }`;
 
   return prefixWithPragma(prefixWithImports(contract));
 };

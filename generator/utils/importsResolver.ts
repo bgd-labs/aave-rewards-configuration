@@ -54,6 +54,9 @@ export function prefixWithImports(code: string) {
   if (findMatch(code, 'IAaveIncentivesController')) {
     imports += `import {IAaveIncentivesController} from '../src/interfaces/IAaveIncentivesController.sol';\n`;
   }
+  if (findMatch(code, 'IPermissionedPayloadsController')) {
+    imports += `import {IPermissionedPayloadsController, PayloadsControllerUtils, IPayloadsControllerCore} from 'aave-address-book/governance-v3/IPermissionedPayloadsController.sol';\n`;
+  }
 
   return imports + code;
 }

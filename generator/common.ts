@@ -158,6 +158,14 @@ export function generateContractName(options: Options, pool?: PoolIdentifier) {
   return name;
 }
 
+export function generateScriptName(options: Options, pool: PoolIdentifier) {
+  let name = `${pool}_`
+  name += `DeployPayload`;
+  name += `${options.shortName}`;
+  name += `_${options.date}`;
+  return name;
+}
+
 export function getChainAlias(chain) {
   return chain === 'Ethereum' ? 'mainnet' : chain.toLowerCase();
 }

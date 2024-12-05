@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import {generateContractName, generateFolderName} from './common';
+import {generateContractName, generateFolderName, generateScriptName, getPoolChain} from './common';
 import {liquidityMiningSetupTemplate} from './templates/liquiditymining.setup.template';
 import {liquidityMiningUpdateTemplate} from './templates/liquiditymining.update.template';
+import {liquidityMiningPayloadDeploymentTemplate} from './templates/liquiditymining.payloaddeployment.template';
 import {confirm} from '@inquirer/prompts';
 import {ConfigFile, Options, PoolConfigs, PoolIdentifier, Files} from './types';
 import prettier from 'prettier';
@@ -29,8 +30,8 @@ export async function generateFiles(options: Options, poolConfigs: PoolConfigs):
     {...prettierTsCfg, filepath: 'foo.ts'}
   );
 
+  const contractName = generateContractName(options, options.pool);
   async function createPayloadTest(options: Options, pool: PoolIdentifier) {
-    const contractName = generateContractName(options, pool);
     const isLMSetup = options.feature == 'SETUP_LM';
 
     return {
@@ -48,9 +49,22 @@ export async function generateFiles(options: Options, poolConfigs: PoolConfigs):
     };
   }
 
+  async function createPayloadDeployment(options: Options, pool: PoolIdentifier) {
+    const scriptName = generateScriptName(options, pool);
+    const code = liquidityMiningPayloadDeploymentTemplate(options);
+    return {
+      payloadDeployment: await prettier.format(code, {
+        ...prettierSolCfg,
+        filepath: 'foo.sol',
+      }),
+      scriptName: scriptName,
+    };
+  }
+
   return {
     jsonConfig,
     payloadTest: await createPayloadTest(options, options.pool),
+    payloadDeployment: await createPayloadDeployment(options, options.pool),
   };
 }
 
@@ -71,7 +85,10 @@ async function askBeforeWrite(options: Options, path: string, content: string) {
 /**
  * Writes the files according to defined folder/file format
  */
-export async function writeFiles(options: Options, {jsonConfig, payloadTest}: Files) {
+export async function writeFiles(
+  options: Options,
+  {jsonConfig, payloadTest, payloadDeployment}: Files
+) {
   const baseName = generateFolderName(options);
   const baseFolder = path.join(process.cwd(), 'tests', baseName);
 
@@ -94,5 +111,11 @@ export async function writeFiles(options: Options, {jsonConfig, payloadTest}: Fi
     options,
     path.join(baseFolder, `${payloadTest.contractName}.t.sol`),
     payloadTest.payloadTest
+  );
+  // write payloadDeployment
+  await askBeforeWrite(
+    options,
+    path.join(baseFolder, `${payloadDeployment.scriptName}.s.sol`),
+    payloadDeployment.payloadDeployment
   );
 }
