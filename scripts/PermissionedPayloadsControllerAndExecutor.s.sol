@@ -7,7 +7,8 @@ import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {PermissionedPayloadsController, IPayloadsControllerCore, PayloadsControllerUtils, IPermissionedPayloadsController}
   from 'aave-governance-v3/contracts/payloads/PermissionedPayloadsController.sol';
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
-import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
+import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
+import {IOwnable} from 'aave-address-book/common/IOwnable.sol';
 
 contract PermissionedPayloadsControllerAndExecutorDeploy is Script {
   function run(
@@ -31,7 +32,7 @@ contract PermissionedPayloadsControllerAndExecutorDeploy is Script {
     permissionedPayloadsController = IPermissionedPayloadsController(
       proxyFactory.create(
         address(permissionedPayloadsController),
-        proxyOwner,
+        ProxyAdmin(proxyOwner),
         abi.encodeWithSelector(
           IPermissionedPayloadsController.initialize.selector,
           guardian,

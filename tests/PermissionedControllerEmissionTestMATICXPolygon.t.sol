@@ -7,8 +7,9 @@ import {LMSetupBaseTest} from './utils/LMSetupBaseTest.sol';
 import {IPermissionedPayloadsController, PayloadsControllerUtils, IPayloadsControllerCore} from 'aave-address-book/governance-v3/IPermissionedPayloadsController.sol';
 
 // TEMPORARY IMPORTS
-import {IOwnable} from 'solidity-utils/contracts/transparent-proxy/interfaces/IOwnable.sol';
+import {IOwnable} from 'aave-address-book/common/IOwnable.sol';
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
+import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {PermissionedPayloadsController} from 'aave-governance-v3/contracts/payloads/PermissionedPayloadsController.sol';
 import {IERC20} from 'forge-std/interfaces/IERC20.sol';
@@ -136,7 +137,7 @@ contract PermissionedControllerEmissionTestMATICXPolygon is LMSetupBaseTest {
     PAYLOADS_CONTROLLER = IPermissionedPayloadsController(
       proxyFactory.create(
         address(permissionedPayloadsControllerImpl),
-        address(728),
+        ProxyAdmin(address(728)),
         abi.encodeWithSelector(
           IPermissionedPayloadsController.initialize.selector,
           address(490),
