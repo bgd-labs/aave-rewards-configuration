@@ -5,9 +5,8 @@ script = 'scripts'
 out = 'out'
 libs = ['lib']
 fs_permissions = [{access = "write", path = "./reports"}]
-solc = '0.8.19'
+solc = '0.8.20'
 evm_version = 'shanghai'
-auto_detect-remappings=false
 no_match_path = "*.s.sol"
 
 [rpc_endpoints]
