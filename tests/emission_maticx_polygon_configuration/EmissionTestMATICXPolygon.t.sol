@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
-import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../src/interfaces/IEmissionManager.sol';
-import {LMSetupBaseTest} from './utils/LMSetupBaseTest.sol';
+import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';
+import {LMSetupBaseTest} from '../utils/LMSetupBaseTest.sol';
 import {IPermissionedPayloadsController, PayloadsControllerUtils, IPayloadsControllerCore} from 'aave-address-book/governance-v3/IPermissionedPayloadsController.sol';
 
 // TEMPORARY IMPORTS
@@ -14,7 +14,7 @@ import {Executor} from 'aave-governance-v3/contracts/payloads/Executor.sol';
 import {PermissionedPayloadsController} from 'aave-governance-v3/contracts/payloads/PermissionedPayloadsController.sol';
 import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 
-contract PermissionedControllerEmissionTestMATICXPolygon is LMSetupBaseTest {
+contract EmissionTestMATICXPolygon is LMSetupBaseTest {
   address public constant override REWARD_ASSET = AaveV3PolygonAssets.MaticX_UNDERLYING;
   uint88 constant DURATION_DISTRIBUTION = 180 days;
   uint256 public constant override TOTAL_DISTRIBUTION = 60000 * 10 ** 18;

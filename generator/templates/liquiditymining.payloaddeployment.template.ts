@@ -17,7 +17,7 @@ export const liquidityMiningPayloadDeploymentTemplate = (
 
 import {${testContractName}, IPermissionedPayloadsController}
   from './${testContractName}.t.sol';
-import {${poolChain}Script} from '../../lib/aave-address-book/lib/aave-v3-origin/lib/solidity-utils/src/contracts/utils/ScriptUtils.sol';
+import {${poolChain}Script} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 
 /**
  * @dev Deploy ${poolChain} 

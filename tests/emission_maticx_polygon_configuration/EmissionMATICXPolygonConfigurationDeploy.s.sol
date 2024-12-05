@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IPermissionedPayloadsController} from 'aave-address-book/governance-v3/IPermissionedPayloadsController.sol';
-import {PermissionedControllerEmissionTestMATICXPolygon} from '../tests/PermissionedControllerEmissionTestMATICXPolygon.t.sol';
+import {EmissionTestMATICXPolygon} from './EmissionTestMATICXPolygon.t.sol';
 import {Script} from 'forge-std/Script.sol';
 
 /**
@@ -18,7 +18,7 @@ import {Script} from 'forge-std/Script.sol';
  * make deploy-private-key contract=scripts/EmissionMATICXPolygonConfigurationDeploy.s.sol chain=polygon private_key=$\{PRIVATE_KEY\}
  */
 contract EmissionMATICXPolygonConfigurationDeploy is
-  PermissionedControllerEmissionTestMATICXPolygon,
+  EmissionTestMATICXPolygon,
   Script
 {
   // solium-disable-next-line
