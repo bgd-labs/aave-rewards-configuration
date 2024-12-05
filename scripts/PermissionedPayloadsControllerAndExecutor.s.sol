@@ -32,7 +32,7 @@ contract PermissionedPayloadsControllerAndExecutorDeploy is Script {
     permissionedPayloadsController = IPermissionedPayloadsController(
       proxyFactory.create(
         address(permissionedPayloadsController),
-        ProxyAdmin(proxyOwner),
+        proxyOwner,
         abi.encodeWithSelector(
           IPermissionedPayloadsController.initialize.selector,
           guardian,
