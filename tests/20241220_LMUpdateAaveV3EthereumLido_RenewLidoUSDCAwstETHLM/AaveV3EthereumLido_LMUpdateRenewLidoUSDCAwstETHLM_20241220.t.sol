@@ -17,7 +17,7 @@ contract AaveV3EthereumLido_LMUpdateRenewLidoUSDCAwstETHLM_20241220 is LMUpdateB
     AaveV3EthereumLido.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 21445046);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21445106);
   }
 
   function test_claimRewards() public {
@@ -40,7 +40,7 @@ contract AaveV3EthereumLido_LMUpdateRenewLidoUSDCAwstETHLM_20241220 is LMUpdateB
       aUSDC_WHALE,
       AaveV3EthereumLidoAssets.USDC_A_TOKEN,
       NEW_DURATION_DISTRIBUTION_END,
-      0.03 * 10 ** 18
+      0.0336 * 10 ** 18
     );
   }
 
