@@ -40,7 +40,7 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM11_20241220 is LMUpdateBaseTest {
       aUSDS_WHALE,
       AaveV3EthereumAssets.USDS_A_TOKEN,
       NEW_DURATION_DISTRIBUTION_END,
-      2003.98 * 10 ** 18
+      2034.52 * 10 ** 18
     );
   }
 
