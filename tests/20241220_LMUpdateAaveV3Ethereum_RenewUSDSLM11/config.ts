@@ -16,7 +16,7 @@ export const config: ConfigFile = {
           rewardTokenDecimals: 18,
           asset: 'USDS_aToken',
           distributionEnd: '7',
-          rewardAmount: '178000',
+          rewardAmount: '180713',
           whaleAddress: '0x06d486A38E1195fdEE147Fbe309821d72b06f197',
           whaleExpectedReward: '2003.98',
         },
