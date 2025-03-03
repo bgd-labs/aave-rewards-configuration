@@ -7,17 +7,19 @@ import {LMUpdateBaseTest} from '../utils/LMUpdateBaseTest.sol';
 
 contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
   address public constant override REWARD_ASSET = AaveV3EthereumAssets.USDS_A_TOKEN;
-  uint256 public constant override NEW_TOTAL_DISTRIBUTION = 738806 * 10 ** 18;
+  uint256 public constant override NEW_TOTAL_DISTRIBUTION = 523392 * 10 ** 18;
   address public constant override EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;
   address public constant override EMISSION_MANAGER = AaveV3Ethereum.EMISSION_MANAGER;
   uint256 public constant NEW_DURATION_DISTRIBUTION_END = 7 days;
   address public constant aUSDS_WHALE = 0x65AE0ed283fA71fd0d22f13512d7e0BD9E54c14A;
 
+  uint256 public constant paddingHours = 8 hours; // allows to go until 12am UTC
+
   address public constant override DEFAULT_INCENTIVES_CONTROLLER =
     AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 21918793);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21965844);
   }
 
   function test_claimRewards() public {
@@ -50,7 +52,10 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
     address[] memory rewards = new address[](1);
     rewards[0] = REWARD_ASSET;
     uint88[] memory newEmissionsPerSecond = new uint88[](1);
-    newEmissionsPerSecond[0] = _toUint88(NEW_TOTAL_DISTRIBUTION / NEW_DURATION_DISTRIBUTION_END);
+
+    uint256 duration = NEW_DURATION_DISTRIBUTION_END + paddingHours;
+
+    newEmissionsPerSecond[0] = _toUint88(NEW_TOTAL_DISTRIBUTION / duration);
 
     newEmissionPerAsset.asset = AaveV3EthereumAssets.USDS_A_TOKEN;
     newEmissionPerAsset.rewards = rewards;
@@ -73,7 +78,9 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
       IRewardsController(AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER).getDistributionEnd(
         newDistributionEndPerAsset.asset,
         newDistributionEndPerAsset.reward
-      ) + NEW_DURATION_DISTRIBUTION_END
+      ) +
+        NEW_DURATION_DISTRIBUTION_END +
+        paddingHours
     );
 
     return newDistributionEndPerAsset;
