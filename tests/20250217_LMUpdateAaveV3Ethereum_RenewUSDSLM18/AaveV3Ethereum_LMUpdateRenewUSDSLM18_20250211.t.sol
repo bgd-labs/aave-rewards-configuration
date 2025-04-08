@@ -7,17 +7,17 @@ import {LMUpdateBaseTest} from '../utils/LMUpdateBaseTest.sol';
 
 contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
   address public constant override REWARD_ASSET = AaveV3EthereumAssets.USDS_A_TOKEN;
-  uint256 public constant override NEW_TOTAL_DISTRIBUTION = 337362 * 10 ** 18;
+  uint256 public constant override NEW_TOTAL_DISTRIBUTION = 350419 * 10 ** 18;
   address public constant override EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;
   address public constant override EMISSION_MANAGER = AaveV3Ethereum.EMISSION_MANAGER;
   uint256 public constant NEW_DURATION_DISTRIBUTION_END = 7 days;
-  address public constant aUSDS_WHALE = 0x65AE0ed283fA71fd0d22f13512d7e0BD9E54c14A;
+  address public constant aUSDS_WHALE = 0x3290b7E095E756EE0fa9f51c4087C9F6546eE4fB;
 
   address public constant override DEFAULT_INCENTIVES_CONTROLLER =
     AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 22167670);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 22223973);
   }
 
   function test_claimRewards() public {
@@ -40,7 +40,7 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
       aUSDS_WHALE,
       AaveV3EthereumAssets.USDS_A_TOKEN,
       NEW_DURATION_DISTRIBUTION_END,
-      7896.46 * 10 ** 18
+      3819.5671 * 10 ** 18
     );
   }
 
