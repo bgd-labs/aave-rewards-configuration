@@ -17,7 +17,7 @@ contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
     AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 22223973);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 22268431);
   }
 
   function test_claimRewards() public {
