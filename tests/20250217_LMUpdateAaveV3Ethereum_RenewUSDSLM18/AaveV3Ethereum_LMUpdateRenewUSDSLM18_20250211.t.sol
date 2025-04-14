@@ -7,7 +7,7 @@ import {LMUpdateBaseTest} from '../utils/LMUpdateBaseTest.sol';
 
 contract AaveV3Ethereum_LMUpdateRenewUSDSLM18_20250217 is LMUpdateBaseTest {
   address public constant override REWARD_ASSET = AaveV3EthereumAssets.USDS_A_TOKEN;
-  uint256 public constant override NEW_TOTAL_DISTRIBUTION = 350419 * 10 ** 18;
+  uint256 public constant override NEW_TOTAL_DISTRIBUTION = 310902 * 10 ** 18;
   address public constant override EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;
   address public constant override EMISSION_MANAGER = AaveV3Ethereum.EMISSION_MANAGER;
   uint256 public constant NEW_DURATION_DISTRIBUTION_END = 7 days;
