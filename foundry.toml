@@ -5,8 +5,9 @@ script = 'scripts'
 out = 'out'
 libs = ['lib']
 fs_permissions = [{access = "write", path = "./reports"}]
-solc = '0.8.19'
+solc = '0.8.27'
 evm_version = 'shanghai'
+ffi = true
 
 [rpc_endpoints]
 mainnet = "${RPC_MAINNET}"
@@ -16,6 +17,7 @@ polygon = "${RPC_POLYGON}"
 arbitrum = "${RPC_ARBITRUM}"
 fantom = "${RPC_FANTOM}"
 harmony = "${RPC_HARMONY}"
+base_sepolia = "${RPC_BASE_SEPOLIA}"
 
 [etherscan]
 mainnet={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=1}
@@ -24,5 +26,6 @@ avalanche={key="${ETHERSCAN_API_KEY_AVALANCHE}",chainId=43114}
 polygon={key="${ETHERSCAN_API_KEY_POLYGON}",chainId=137}
 arbitrum={key="${ETHERSCAN_API_KEY_ARBITRUM}",chainId=42161}
 fantom={key="${ETHERSCAN_API_KEY_FANTOM}",chainId=250}
+base_sepolia={key="${ETHERSCAN_API_KEY_BASE}",chainId=84532}
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config
