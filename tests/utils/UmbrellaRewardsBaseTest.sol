@@ -156,7 +156,6 @@ abstract contract UmbrellaRewardsBaseTest is Test {
   }
 
   function _skipTestIfCI() internal {
-    console.log('PROFILE', vm.envString('FOUNDRY_PROFILE'));
     if (keccak256(abi.encodePacked(vm.envString('FOUNDRY_PROFILE'))) == keccak256(abi.encodePacked('ci'))) {
       vm.skip(true);
     }
