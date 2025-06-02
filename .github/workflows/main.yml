@@ -10,6 +10,6 @@ on:
 jobs:
   test:
     uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
-    with:
-      FOUNDRY_PROFILE: "ci"
     secrets: inherit
+    env:
+      FOUNDRY_PROFILE: ci
