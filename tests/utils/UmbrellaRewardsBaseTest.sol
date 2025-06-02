@@ -44,6 +44,7 @@ abstract contract UmbrellaRewardsBaseTest is Test {
   function networkConfig() public virtual returns (NetworkConfig memory);
 
   function test_sendTransactionViaPrivateKey() public {
+    _skipTestIfCI();
     (address[] memory targets, bytes[] memory calldatas) = _getCalldata();
     vm.rememberKey(vm.envUint('PRIVATE_KEY'));
 
@@ -53,6 +54,7 @@ abstract contract UmbrellaRewardsBaseTest is Test {
   }
 
   function test_sendTransactionViaLedger() public {
+    _skipTestIfCI();
     (address[] memory targets, bytes[] memory calldatas) = _getCalldata();
 
     _safe.proposeTransactions(
@@ -151,5 +153,11 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       signature: '',
       callData: txCalldata
     });
+  }
+
+  function _skipTestIfCI() internal {
+    if (keccak256(abi.encodePacked(vm.envString('FOUNDRY_PROFILE'))) == keccak256(abi.encodePacked('ci'))) {
+      vm.skip(true);
+    }
   }
 }
