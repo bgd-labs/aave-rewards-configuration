@@ -11,5 +11,3 @@ jobs:
   test:
     uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
     secrets: inherit
-    env:
-      FOUNDRY_PROFILE: ci
