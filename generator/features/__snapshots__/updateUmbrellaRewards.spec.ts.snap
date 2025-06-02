@@ -35,9 +35,9 @@ export const config: ConfigFile = {
 pragma solidity ^0.8.0;
 
 import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
-import {UmbrellaBaseSepoliaAssets} from 'aave-address-book/UmbrellaBaseSepolia.sol';
-import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';
 import {UmbrellaBaseSepoliaConfig} from '../utils/networkConfig/UmbrellaBaseSepoliaConfig.sol';
+import {UmbrellaBaseSepolia} from 'aave-address-book/UmbrellaBaseSepolia.sol';
+import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';
 
 /**
  * private-key: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_sendTransactionViaPrivateKey -vv
