@@ -1,0 +1,93 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`feature: updateUmbrellaRewards > should properly generate files 1`] = `
+{
+  "jsonConfig": "import {ConfigFile} from '../../generator/types';
+export const config: ConfigFile = {
+  rootOptions: {
+    pool: 'AaveV3BaseSepolia',
+    title: 'test',
+    shortName: 'Test',
+    date: '20250602',
+    feature: 'UPDATE_UMBRELLA_REWARDS',
+  },
+  poolOptions: {
+    AaveV3BaseSepolia: {
+      configs: {
+        UPDATE_LM: [
+          {
+            asset: 'STK_WETH_V1',
+            reward: '0x73a5bB60b0B0fc35710DDc0ea9c407031E31Bdbb',
+            rewardPayer: '0x24f321Cd3742B7a191e5ED7cE1be8059DEe91424',
+            maxEmissionsPerSecond: 'EngineFlags.KEEP_CURRENT',
+            distributionEnd: 'block.timestamp + 120 days',
+          },
+        ],
+      },
+      cache: {blockNumber: 42},
+    },
+  },
+};
+",
+  "payloadTest": {
+    "contractName": "AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602",
+    "payloadTest": "// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
+import {UmbrellaBaseSepoliaAssets} from 'aave-address-book/UmbrellaBaseSepolia.sol';
+import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';
+import {UmbrellaBaseSepoliaConfig} from '../utils/networkConfig/UmbrellaBaseSepoliaConfig.sol';
+
+/**
+ * private-key: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_sendTransactionViaPrivateKey -vv
+ * ledger: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_sendTransactionViaLedger -vv
+ * emit Calldata only: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_logCalldatas -vv
+ */
+contract AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602 is
+  UmbrellaRewardsBaseTest,
+  UmbrellaBaseSepoliaConfig
+{
+  function configureUpdates() public pure override returns (RewardConfig[] memory) {
+    RewardConfig[] memory newConfig = new RewardConfig[](1);
+
+    newConfig[0] = RewardConfig({
+      asset: UmbrellaBaseSepoliaAssets.STK_WETH_V1,
+      reward: 0x73a5bB60b0B0fc35710DDc0ea9c407031E31Bdbb, // aBasSepWETH
+      rewardPayer: 0x24f321Cd3742B7a191e5ED7cE1be8059DEe91424,
+      maxEmissionPerSecond: EngineFlags.KEEP_CURRENT,
+      distributionEnd: block.timestamp + 120 days
+    });
+
+    return newConfig;
+  }
+}
+",
+    "pool": "AaveV3BaseSepolia",
+  },
+}
+`;
+
+exports[`feature: updateUmbrellaRewards > should return reasonable code 1`] = `
+{
+  "code": {
+    "fn": [
+      "
+          function configureUpdates() public pure override returns (RewardConfig[] memory) {
+          RewardConfig[] memory newConfig = new RewardConfig[](1);
+
+          newConfig[0] = RewardConfig({
+               asset: UmbrellaBaseSepoliaAssets.STK_WETH_V1,
+               reward: 0x73a5bB60b0B0fc35710DDc0ea9c407031E31Bdbb, // aBasSepWETH
+               rewardPayer: 0x24f321Cd3742B7a191e5ED7cE1be8059DEe91424,
+               maxEmissionPerSecond: EngineFlags.KEEP_CURRENT,
+               distributionEnd: block.timestamp + 120 days
+             });
+
+          return newConfig;
+        }
+        ",
+    ],
+  },
+}
+`;

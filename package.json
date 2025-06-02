@@ -1,5 +1,5 @@
 {
-  "name": "example-liquidity-mining-aave-v3",
+  "name": "aave-reward-configurations",
   "version": "1.0.0",
   "scripts": {
     "test": "vitest generator",

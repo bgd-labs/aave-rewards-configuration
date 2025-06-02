@@ -116,6 +116,7 @@ export async function getTokenSymbols(assets: Hex[], chainId: number): Promise<s
 }
 
 export function getPoolChain(pool: PoolIdentifier) {
+  if (pool == 'AaveV3EthereumLido' || pool == 'AaveV3EthereumEtherFi') return 'Ethereum';
   const chainName = pool.replace('AaveV3', '');
   const chain = AVAILABLE_CHAINS.find((chain) => chainName === chain);
   if (!chain) throw new Error('cannot find chain for pool');

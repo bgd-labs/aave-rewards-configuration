@@ -14,7 +14,7 @@ import {LiquidityMiningSetup, LiquidityMiningUpdate, UmbrellaRewardsUpdate} from
 const program = new Command();
 
 program
-  .name('aave-rewards-configuration-generator')
+  .name('aave-reward-configurations-generator')
   .description('CLI to generate scripts for updating umbrella rewards and LM on aave')
   .version('1.0.0')
   .addOption(new Option('-f, --force', 'force creation (might overwrite existing files)'))

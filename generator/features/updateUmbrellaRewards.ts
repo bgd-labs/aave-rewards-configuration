@@ -58,7 +58,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
 
   for (const reward of rewardsAddresses) {
     const maxEmissionsPerSecondChoice = await select({
-      message: `Please input the maxEmissionsPerSecond you want to configure for the asset: ${asset} and reward: ${reward.symbol}`,
+      message: `Please input the maxEmissionsPerSecond you want to configure for the reward: ${reward.symbol} and asset: ${asset}`,
       choices: [
         {name: 'Keep maxEmissionsPerSecond the same as current', value: 'current'},
         {name: 'Enter maxEmissionsPerSecond in token units / days', value: 'units'},
@@ -84,7 +84,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     }
 
     const distributionEndChoice = await select({
-      message: `Please input the distributionEnd you want to configure for the asset: ${asset} and reward: ${reward.symbol}`,
+      message: `Please input the distributionEnd you want to configure for the reward: ${reward.symbol} and asset: ${asset}`,
       choices: [
         {name: 'Keep distributionEnd the same as current', value: 'current'},
         {name: 'Enter distributionEnd in days from current timestamp', value: 'units'},

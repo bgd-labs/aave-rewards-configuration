@@ -1,10 +1,35 @@
-# Liquidity Mining on Aave V3 Example Repository
+# Aave Rewards Configuration Repository
 
-This repository contains:
+This repository contains examples on how to configure Umbrella Rewards and Liquidity Mining and on Aave including:
 
-- an [example proposal](./src/contracts/AddEmissionAdminPayload.sol) payload which could be used to setup liquidity mining on a governance controlled aave v3 pool
+- a [test](./tests/UmbrellaRewardsTestBaseSep.t.sol) simulating the configuration of updating umbrella rewards
 - a [test](./tests/EmissionTestOpOptimism.t.sol) simulating the configuration of certain assets to receive liquidity mining
 - a [test](./tests/EmissionConfigurationTestMATICXPolygon.t.sol) simulating the setting up of new configuration of certain assets after the liquidity mining program has been created
+- an [example proposal](./src/contracts/AddEmissionAdminPayload.sol) payload which could be used to setup liquidity mining on a governance controlled aave v3 pool
+
+<br/>
+
+## Instructions to update Umbrella Rewards on Aave V3:
+
+Umbrella Rewards can be updated either via governance or an entity having the `REWARDS_ADMIN` role.
+The `REWARDS_ADMIN` role has been given to the [permissioned-payloads-controller](https://github.com/bgd-labs/aave-governance-v3/blob/main/docs/permissioned-payloads-controller-overview.md) system, which allows to update rewards in a timelock manner.
+
+### How it works:
+
+The PayloadsManager i.e `ALC Multi-sig` calls `createPayload()` on the PermissionedPayloadsController contract with the calldata as function param to call `configureRewards()` on the Umbrella RewardsController.
+Once the payload is created with the calldata, the payload is in queued state and it will be automatically executed by the Aave Robot once the delay has passed (1 day at time of configuration). Before the payload is executed, the guardian (BGD Labs) can check if there is any misconfiguration and if so can cancel the payload.
+
+More extensive documentation about Umbrella RewardsController can be found [here](https://github.com/aave-dao/aave-umbrella/tree/main/src/contracts/rewards).
+
+<img width="732" alt="Screenshot 2025-06-02 at 2 17 10 PM" src="https://github.com/user-attachments/assets/b1a518fe-7ad6-4298-b743-3672bbb7640a" />
+
+The following reward params can be updated for an Umbrella Asset and Reward pair:
+
+- `maxEmissionsPerSecond`: It is the maximum possible emission, which will be reached by depositing `targetLiquidity` amount of assets.
+- `distributionEnd`: It is the timestamp when reward emissions stop.
+- `rewardPayer`: It is an address funding the rewards (in most cases is the Aave Collector)
+
+_Please note: Before updating the umbrella rewards, make sure the rewardPayer (default is AaveCollector) has sufficient funds and approval for the new configuration_
 
 ## Instructions to activate Liquidity Mining on Aave V3:
 
@@ -78,7 +103,7 @@ Below is an example with the pseudo code to activate Liquidity Mining for the va
    }])
    ```
 
-## How to modify emissions of the LM program?
+### How to modify emissions of the LM program?
 
 The function `_getEmissionsPerAsset()` on [EmissionTestOpOptimism.t.sol](./tests/EmissionTestOpOptimism.t.sol) defines the exact emissions for the particular case of $OP as reward token and a total distribution of 5'000'000 $OP during exactly 90 days.
 The emissions can be modified there, with the only requirement being that `sum(all-emissions) == TOTAL_DISTRIBUTION`
@@ -87,7 +112,7 @@ You can run the test via `forge test -vv` which will emit the selector encoded c
 
 _Note: The test example above uses total distribution and duration distribution just for convenience to define emissions per second, in reality as we only pass emissions per second to `configureAssets()` we could define it in any way we wish._
 
-## How to configure emissions after the LM program has been created?
+### How to configure emissions after the LM program has been created?
 
 After the LM program has been created, the emissions per second and the distribution end could be changed later on by the emissions admin to reduce the LM rewards or change the end date for the distribution. This can be done by calling `setEmissionPerSecond()` and `setDistributionEnd()` on the Emission Manager contract. The test examples on [EmissionConfigurationTestMATICXPolygon.t.sol](./tests/EmissionConfigurationTestMATICXPolygon.t.sol) shows how to do so.
 
@@ -95,7 +120,7 @@ The function `_getNewEmissionPerSecond()` and `_getNewDistributionEnd()` defines
 
 Similarly you can also run the test via `forge test -vv` which will emit the selector encoded calldata for `setEmissionPerSecond` and `setDistributionEnd` which can be used to make the configuration changes.
 
-## FAQ's:
+### FAQ's:
 
 - Do we need to have and approve the whole liquidity mining reward initially?
 
