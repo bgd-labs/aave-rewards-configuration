@@ -42,6 +42,15 @@ export function prefixWithImports(code: string) {
     imports += addressBookImports;
   }
 
+  if (findMatch(code, 'EngineFlags')) {
+    imports += `import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';\n`;
+  }
+  if (findMatch(code, 'UmbrellaEthereumAssets')) {
+    imports += `import {UmbrellaEthereumAssets} from 'aave-address-book/UmbrellaEthereum.sol';\n`;
+  }
+  if (findMatch(code, 'UmbrellaBaseSepoliaAssets')) {
+    imports += `import {UmbrellaBaseSepoliaAssets} from 'aave-address-book/UmbrellaBaseSepolia.sol';\n`;
+  }
   if (findMatch(code, 'IEmissionManager')) {
     imports += `import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';\n`;
   }
@@ -53,6 +62,15 @@ export function prefixWithImports(code: string) {
   }
   if (findMatch(code, 'IAaveIncentivesController')) {
     imports += `import {IAaveIncentivesController} from '../src/interfaces/IAaveIncentivesController.sol';\n`;
+  }
+  if (findMatch(code, 'UmbrellaRewardsBaseTest')) {
+    imports += `import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';\n`;
+  }
+  if (findMatch(code, 'UmbrellaBaseSepoliaConfig')) {
+    imports += `import {UmbrellaBaseSepoliaConfig} from '../utils/networkConfig/UmbrellaBaseSepoliaConfig.sol';\n`;
+  }
+  if (findMatch(code, 'UmbrellaEthereumConfig')) {
+    imports += `import {UmbrellaEthereumConfig} from '../utils/networkConfig/UmbrellaEthereumConfig.sol';\n`;
   }
 
   return imports + code;

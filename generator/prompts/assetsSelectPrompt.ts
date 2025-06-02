@@ -1,7 +1,8 @@
+import {isAddress, Hex} from 'viem';
 import {checkbox, select} from '@inquirer/prompts';
-import {GenericPoolPrompt} from './types';
-import {getAssets, getSupplyAssets, getSupplyBorrowAssets} from '../common';
+import {getAssets, getSupplyAssets, getSupplyBorrowAssets, getUmbrellaFromPool, getUmbrellaStkAssets} from '../common';
 import {PoolIdentifier} from '../types';
+import {GenericPoolPrompt} from './types';
 
 /**
  * allows selecting multiple assets
@@ -19,6 +20,14 @@ export async function assetsSelectPrompt({pool, message}: GenericPoolPrompt) {
   });
 }
 
+export async function addressCheckboxPromptWithSymbol(assets: Hex[], symbols: string[], message: string) {
+  return await checkbox({
+    message,
+    choices: assets.map((asset, i) => ({name: symbols[i], value: {asset, symbol: symbols[i]}})),
+    required: true
+  });
+}
+
 export async function supplyUnderlyingAssetsSelectPrompt({pool, message}: GenericPoolPrompt) {
   return await select({
     message,
@@ -26,6 +35,16 @@ export async function supplyUnderlyingAssetsSelectPrompt({pool, message}: Generi
       {name: 'Custom Address (Enter Manually)', value: 'custom'},
       ...getAssets(pool).map((asset) => ({name: asset, value: asset})),
       ...getSupplyAssets(pool).map((asset) => ({name: asset, value: asset})),
+    ],
+  });
+}
+
+export async function umbrellaStkAssetsSelectPrompt({pool, message}: GenericPoolPrompt) {
+  return await select({
+    message,
+    choices: [
+      {name: 'Custom Address (Enter Manually)', value: 'custom'},
+      ...getUmbrellaStkAssets(pool).map((asset) => ({name: asset, value: asset})),
     ],
   });
 }
@@ -71,4 +90,11 @@ export function translateSupplyBorrowAssetToWhaleConstant(value: string, pool: P
     ? value.replace('_variableDebtToken', '')
     : value.replace('_aToken', '');
   return isBorrowAsset ? `v${underlyingAsset}_WHALE` : `a${underlyingAsset}_WHALE`;
+}
+
+export function translateUmbrellaAssetLibUnderlying(value: string, pool: PoolIdentifier) {
+  if (isAddress(value)) return value;
+
+  const umbrella = getUmbrellaFromPool(pool);
+  return `${umbrella}Assets.${value}`;
 }

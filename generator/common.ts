@@ -1,5 +1,5 @@
 import * as addressBook from '@bgd-labs/aave-address-book';
-import {Options, PoolIdentifier, PoolIdentifierV3} from './types';
+import {FEATURE, Options, PoolIdentifier, UmbrellaIdentifier} from './types';
 import {
   arbitrum,
   avalanche,
@@ -8,6 +8,7 @@ import {
   optimism,
   polygon,
   base,
+  baseSepolia,
   bsc,
   gnosis,
   scroll,
@@ -28,6 +29,7 @@ export const AVAILABLE_CHAINS = [
   'Harmony',
   'Metis',
   'Base',
+  'BaseSepolia',
   'BNB',
   'Gnosis',
   'Scroll',
@@ -99,7 +101,32 @@ export async function getTokenDecimals(asset: Hex, chainId: number): Promise<num
   return assetContract.read.decimals();
 }
 
+export async function getTokenSymbols(assets: Hex[], chainId: number): Promise<string[]> {
+  const contracts = assets.map((asset) =>
+    getContract({
+      abi: IERC20Detailed_ABI,
+      client: CHAIN_ID_CLIENT_MAP[chainId],
+      address: asset,
+    })
+  );
+  const symbols = await Promise.all(
+    contracts.map(contract => contract.read.symbol())
+  );
+  return symbols;
+}
+
 export function getPoolChain(pool: PoolIdentifier) {
+  const chainName = pool.replace('AaveV3', '');
+  const chain = AVAILABLE_CHAINS.find((chain) => chainName === chain);
+  if (!chain) throw new Error('cannot find chain for pool');
+  return chain;
+}
+
+export function getDefaultCollector(pool: PoolIdentifier): string {
+  return `address(${pool}.COLLECTOR)`;
+}
+
+export function getUmbrellaFromPoolChain(pool: PoolIdentifier) {
   const chain = AVAILABLE_CHAINS.find((chain) => pool.indexOf(chain) !== -1);
   if (!chain) throw new Error('cannot find chain for pool');
   return chain;
@@ -137,10 +164,16 @@ export function getDate() {
  * @returns
  */
 export function generateFolderName(options: Options) {
-  const isLMSetup = options.feature == 'SETUP_LM';
-  return isLMSetup
-    ? `${options.date}_LMSetup${options.pool}_${options.shortName}`
-    : `${options.date}_LMUpdate${options.pool}_${options.shortName}`;
+  let featureString: string;
+
+  if (options.feature == FEATURE.SETUP_LM) {
+    featureString = '_LMSetup';
+  } else if (options.feature == FEATURE.UPDATE_LM) {
+    featureString = '_LMUpdate';
+  } else {
+    featureString = '_UmbrellaUpdate';
+  }
+  return `${options.date}${featureString}${options.pool}_${options.shortName}`;
 }
 
 /**
@@ -151,8 +184,13 @@ export function generateFolderName(options: Options) {
  */
 export function generateContractName(options: Options, pool?: PoolIdentifier) {
   let name = pool ? `${pool}_` : '';
-  const isLMSetup = options.feature == 'SETUP_LM';
-  name += isLMSetup ? 'LMSetup' : 'LMUpdate';
+  if (options.feature == FEATURE.SETUP_LM) {
+    name += 'LMSetup';
+  } else if (options.feature == FEATURE.UPDATE_LM) {
+    name += 'LMUpdate';
+  } else {
+    name += 'UmbrellaRewardsUpdate';
+  }
   name += `${options.shortName}`;
   name += `_${options.date}`;
   return name;
@@ -179,11 +217,32 @@ export const CHAIN_TO_CHAIN_ID = {
   Avalanche: avalanche.id,
   Metis: metis.id,
   Base: base.id,
+  BaseSepolia: baseSepolia.id,
   BNB: bsc.id,
   Gnosis: gnosis.id,
   Scroll: scroll.id,
   ZkSync: zkSync.id,
 };
+
+export function getUmbrellaStkAssets(pool: PoolIdentifier): string[] {
+  return Object.keys(addressBook[getUmbrellaFromPool(pool)].UMBRELLA_STAKE_ASSETS);
+}
+
+export function getUmbrellaFromPool(pool: PoolIdentifier): UmbrellaIdentifier {
+  const chain = getPoolChain(pool);
+  // Map of normal pools to their Umbrella counterparts
+  const poolToUmbrellaMap: Partial<Record<PoolIdentifier, UmbrellaIdentifier>> = {
+    'AaveV3Ethereum': 'UmbrellaEthereum',
+    'AaveV3BaseSepolia': 'UmbrellaBaseSepolia',
+  };
+
+  const umbrellaPool = poolToUmbrellaMap[pool];
+  if (!umbrellaPool) {
+    throw new Error(`No Umbrella pool found for ${pool}`);
+  }
+
+  return umbrellaPool;
+}
 
 export function flagAsRequired(message: string, required?: boolean) {
   return required ? `${message}*` : message;
