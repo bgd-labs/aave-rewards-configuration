@@ -160,7 +160,7 @@ if (options.configFile) {
 
   if (!options.title) {
     options.title = await input({
-      message: 'Short title of the rewards program',
+      message: 'Short title of the rewards program:',
       validate(input) {
         if (input.length == 0) return "Your title can't be empty";
         if (input.trim().length > 80) return 'Your title is to long';
