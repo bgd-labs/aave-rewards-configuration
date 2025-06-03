@@ -147,7 +147,7 @@ export const updateUmbrellaRewards: FeatureModule<UmbrellaRewardsUpdate[]> = {
       code: {
         fn: [
           `
-          function configureUpdates() public pure override returns (RewardConfig[] memory) {
+          function configureUpdates() public view override returns (RewardConfig[] memory) {
           RewardConfig[] memory newConfig = new RewardConfig[](${cfg.length});
 
           ${cfg

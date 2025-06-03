@@ -36,7 +36,7 @@ pragma solidity ^0.8.0;
 
 import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
 import {UmbrellaBaseSepoliaConfig} from '../utils/networkConfig/UmbrellaBaseSepoliaConfig.sol';
-import {UmbrellaBaseSepolia} from 'aave-address-book/UmbrellaBaseSepolia.sol';
+import {UmbrellaBaseSepoliaAssets} from 'aave-address-book/UmbrellaBaseSepolia.sol';
 import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';
 
 /**
@@ -48,7 +48,7 @@ contract AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602 is
   UmbrellaRewardsBaseTest,
   UmbrellaBaseSepoliaConfig
 {
-  function configureUpdates() public pure override returns (RewardConfig[] memory) {
+  function configureUpdates() public view override returns (RewardConfig[] memory) {
     RewardConfig[] memory newConfig = new RewardConfig[](1);
 
     newConfig[0] = RewardConfig({
@@ -73,7 +73,7 @@ exports[`feature: updateUmbrellaRewards > should return reasonable code 1`] = `
   "code": {
     "fn": [
       "
-          function configureUpdates() public pure override returns (RewardConfig[] memory) {
+          function configureUpdates() public view override returns (RewardConfig[] memory) {
           RewardConfig[] memory newConfig = new RewardConfig[](1);
 
           newConfig[0] = RewardConfig({
