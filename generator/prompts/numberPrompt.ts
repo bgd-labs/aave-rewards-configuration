@@ -35,6 +35,22 @@ export async function numberPrompt({message, required}: GenericPrompt, opts?) {
   );
 }
 
+export async function numberPromptNoTransform({message, required}: GenericPrompt, opts?) {
+  return await advancedInput(
+    {
+      message,
+      transformer: undefined,
+      validate: (v) => {
+        if (required && v.length == 0) return false;
+        return isNumber(v);
+      },
+      pattern: /^[0-9]*$/,
+      patternError: 'Only full numbers are allowed',
+    },
+    opts
+  );
+}
+
 export async function numberPromptInDays({message, required}: GenericPrompt, opts?) {
   return await advancedInput(
     {
