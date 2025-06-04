@@ -93,7 +93,6 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
         maxEmissionsSame = true;
         cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
-        console.log('currentRewardData.maxEmissionPerSecond', currentRewardData.maxEmissionPerSecond);
       }
 
       if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
