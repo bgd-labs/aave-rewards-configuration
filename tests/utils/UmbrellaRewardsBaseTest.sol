@@ -36,6 +36,35 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     _getCalldata();
   }
 
+  function test_sanity() public {
+    RewardConfig[] memory config = configureUpdates();
+
+    for (uint256 i = 0; i < config.length; i++) {
+      RewardConfig memory cfg = config[i];
+      IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
+        networkConfig().rewardsController
+      ).getRewardData(cfg.asset, cfg.reward);
+
+      if (cfg.maxEmissionPerSecond != EngineFlags.KEEP_CURRENT && currentRewardData.maxEmissionPerSecond != 0) {
+        vm.assertApproxEqRel(
+          cfg.maxEmissionPerSecond,
+          currentRewardData.maxEmissionPerSecond,
+          0.75e18 // 75%
+          ,
+          'maxEmissionPerSecond change more than 75% than currently configured'
+        );
+      }
+
+      if (cfg.distributionEnd != EngineFlags.KEEP_CURRENT && currentRewardData.distributionEnd != 0) {
+        vm.assertLt(
+          cfg.distributionEnd,
+          currentRewardData.distributionEnd + 366 days,
+          'distributionEnd increased by more than 1 year than currently configured'
+        );
+      }
+    }
+  }
+
   function _getCalldata() internal returns (address[] memory targets, bytes[] memory calldatas) {
     RewardConfig[] memory config = configureUpdates();
     NetworkConfig memory network = networkConfig();
@@ -54,31 +83,26 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     for (uint256 i = 0; i < config.length; i++) {
       RewardConfig memory cfg = config[i];
 
-      IRewardsStructs.RewardDataExternal memory currentRewardData;
       bool maxEmissionsSame;
       bool distributionEndSame;
 
-      if (
-        cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT ||
-        cfg.distributionEnd == EngineFlags.KEEP_CURRENT
-      ) {
-        currentRewardData = IRewardsController(
-          network.rewardsController
-        ).getRewardData(cfg.asset, cfg.reward);
+      IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
+        network.rewardsController
+      ).getRewardData(cfg.asset, cfg.reward);
 
-        if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
-          maxEmissionsSame = true;
-          cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
-        }
+      if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
+        maxEmissionsSame = true;
+        cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
+        console.log('currentRewardData.maxEmissionPerSecond', currentRewardData.maxEmissionPerSecond);
+      }
 
-        if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
-          distributionEndSame = true;
-          cfg.distributionEnd = currentRewardData.distributionEnd;
-        }
+      if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
+        distributionEndSame = true;
+        cfg.distributionEnd = currentRewardData.distributionEnd;
+      }
 
-        if (cfg.rewardPayer == EngineFlags.KEEP_CURRENT_ADDRESS) {
-          revert('REWARD_PAYER_CANNOT_BE_KEEP_CURRENT');
-        }
+      if (cfg.rewardPayer == EngineFlags.KEEP_CURRENT_ADDRESS) {
+        revert('REWARD_PAYER_CANNOT_BE_KEEP_CURRENT');
       }
 
       IRewardsStructs.RewardSetupConfig[]

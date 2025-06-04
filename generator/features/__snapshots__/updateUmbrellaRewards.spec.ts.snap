@@ -40,9 +40,7 @@ import {UmbrellaBaseSepoliaAssets} from 'aave-address-book/UmbrellaBaseSepolia.s
 import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';
 
 /**
- * private-key: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_sendTransactionViaPrivateKey -vv
- * ledger: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_sendTransactionViaLedger -vv
- * emit Calldata only: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol --mt test_logCalldatas -vv
+ * emit calldata: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol -vv
  */
 contract AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602 is
   UmbrellaRewardsBaseTest,

@@ -8,7 +8,7 @@ import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/
 import {UmbrellaBaseSepoliaConfig} from './utils/networkConfig/UmbrellaBaseSepoliaConfig.sol';
 
 /**
- * emit calldata: forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_logCalldatas -vv
+ * emit calldata: forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol -vv
  */
 contract UmbrellaRewardsTestBaseSep is UmbrellaRewardsBaseTest, UmbrellaBaseSepoliaConfig {
   function configureUpdates() public view override returns (RewardConfig[] memory) {

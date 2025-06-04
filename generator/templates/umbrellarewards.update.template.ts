@@ -26,7 +26,7 @@ export const umbrellaRewardsUpdateTemplate = (
 
   const contract = `
   /**
-   * emit calldata: forge test --mp ${path} --mt test_logCalldatas -vv
+   * emit calldata: forge test --mp ${path} -vv
    */
   contract ${contractName} is UmbrellaRewardsBaseTest, Umbrella${chain}Config {
    ${constants}
