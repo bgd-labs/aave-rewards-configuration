@@ -23,6 +23,7 @@ The following reward params can be updated for an Umbrella Asset and Reward pair
 _Please note: Before updating the umbrella rewards, make sure the rewardPayer (default is AaveCollector) has sufficient funds and approval for the new configuration and only the above params are allowed to be updated via the PermissionedPayloadsController infra, and other params like targetLiquidity can only be changed by the Aave Governance_
 
 ### How to use the cli generator to update Umbrella Rewards:
+
 This repository includes a cli generator to help you bootstrap the required scripts for updating umbrella rewards.
 To run the generator you need to run: `npm run generate`
 

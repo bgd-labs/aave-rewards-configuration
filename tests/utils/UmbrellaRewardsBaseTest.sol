@@ -45,17 +45,21 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         networkConfig().rewardsController
       ).getRewardData(cfg.asset, cfg.reward);
 
-      if (cfg.maxEmissionPerSecond != EngineFlags.KEEP_CURRENT && currentRewardData.maxEmissionPerSecond != 0) {
+      if (
+        cfg.maxEmissionPerSecond != EngineFlags.KEEP_CURRENT &&
+        currentRewardData.maxEmissionPerSecond != 0
+      ) {
         vm.assertApproxEqRel(
           cfg.maxEmissionPerSecond,
           currentRewardData.maxEmissionPerSecond,
-          0.75e18 // 75%
-          ,
+          0.75e18, // 75%
           'maxEmissionPerSecond change more than 75% than currently configured'
         );
       }
 
-      if (cfg.distributionEnd != EngineFlags.KEEP_CURRENT && currentRewardData.distributionEnd != 0) {
+      if (
+        cfg.distributionEnd != EngineFlags.KEEP_CURRENT && currentRewardData.distributionEnd != 0
+      ) {
         vm.assertLt(
           cfg.distributionEnd,
           currentRewardData.distributionEnd + 366 days,
@@ -72,13 +76,17 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     calldatas = new bytes[](config.length);
     targets = new address[](config.length);
 
-    console.log('------------------------------------------------------------------------------------');
     console.log(
-        'Safe Address',
-        IPermissionedPayloadsController(network.permissionedPayloadsController).payloadsManager()
-      );
+      '------------------------------------------------------------------------------------'
+    );
+    console.log(
+      'Safe Address',
+      IPermissionedPayloadsController(network.permissionedPayloadsController).payloadsManager()
+    );
     console.log('Target Contract', network.permissionedPayloadsController);
-    console.log('------------------------------------------------------------------------------------');
+    console.log(
+      '------------------------------------------------------------------------------------'
+    );
 
     for (uint256 i = 0; i < config.length; i++) {
       RewardConfig memory cfg = config[i];
@@ -134,16 +142,31 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         _createAction(network.rewardsController, rewardsCalldata)
       );
 
-      console.log('Changelog for reward', IERC20(cfg.reward).symbol(), ' asset', IERC20(cfg.asset).symbol());
+      console.log(
+        'Changelog for reward',
+        IERC20(cfg.reward).symbol(),
+        ' asset',
+        IERC20(cfg.asset).symbol()
+      );
       if (maxEmissionsSame) {
         console.log('maxEmissionsPerSecond: UNCHANGED');
       } else {
-        console.log('maxEmissionsPerSecond: Changed from', currentRewardData.maxEmissionPerSecond, ' to', cfg.maxEmissionPerSecond);
+        console.log(
+          'maxEmissionsPerSecond: Changed from',
+          currentRewardData.maxEmissionPerSecond,
+          ' to',
+          cfg.maxEmissionPerSecond
+        );
       }
       if (distributionEndSame) {
         console.log('distributionEnd: UNCHANGED');
       } else {
-        console.log('distributionEnd: Changed from', currentRewardData.distributionEnd, ' to', cfg.distributionEnd);
+        console.log(
+          'distributionEnd: Changed from',
+          currentRewardData.distributionEnd,
+          ' to',
+          cfg.distributionEnd
+        );
       }
 
       console.log('Calldata: ');

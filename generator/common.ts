@@ -109,9 +109,7 @@ export async function getTokenSymbols(assets: Hex[], chainId: number): Promise<s
       address: asset,
     })
   );
-  const symbols = await Promise.all(
-    contracts.map(contract => contract.read.symbol())
-  );
+  const symbols = await Promise.all(contracts.map((contract) => contract.read.symbol()));
   return symbols;
 }
 
@@ -225,9 +223,13 @@ export const CHAIN_TO_CHAIN_ID = {
   ZkSync: zkSync.id,
 };
 
-export async function getMaxEmissionsPerSecondToReadable(chainId: number, reward: Hex, emission: number): Promise<string> {
+export async function getMaxEmissionsPerSecondToReadable(
+  chainId: number,
+  reward: Hex,
+  emission: number
+): Promise<string> {
   const rewardDecimals = await getTokenDecimals(reward, chainId);
-  const emissionsPerMonth = (emission * (30 * 24 * 3600)) / (10 ** rewardDecimals);
+  const emissionsPerMonth = (emission * (30 * 24 * 3600)) / 10 ** rewardDecimals;
   return `~${emissionsPerMonth.toFixed(2)} token units per month`;
 }
 
@@ -239,8 +241,8 @@ export function getUmbrellaFromPool(pool: PoolIdentifier): UmbrellaIdentifier {
   const chain = getPoolChain(pool);
   // Map of normal pools to their Umbrella counterparts
   const poolToUmbrellaMap: Partial<Record<PoolIdentifier, UmbrellaIdentifier>> = {
-    'AaveV3Ethereum': 'UmbrellaEthereum',
-    'AaveV3BaseSepolia': 'UmbrellaBaseSepolia',
+    AaveV3Ethereum: 'UmbrellaEthereum',
+    AaveV3BaseSepolia: 'UmbrellaBaseSepolia',
   };
 
   const umbrellaPool = poolToUmbrellaMap[pool];
