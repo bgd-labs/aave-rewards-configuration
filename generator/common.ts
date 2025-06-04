@@ -225,6 +225,12 @@ export const CHAIN_TO_CHAIN_ID = {
   ZkSync: zkSync.id,
 };
 
+export async function getMaxEmissionsPerSecondToReadable(chainId: number, reward: Hex, emission: number): Promise<string> {
+  const rewardDecimals = await getTokenDecimals(reward, chainId);
+  const emissionsPerMonth = (emission * (30 * 24 * 3600)) / (10 ** rewardDecimals);
+  return `~${emissionsPerMonth.toFixed(2)} token units per month`;
+}
+
 export function getUmbrellaStkAssets(pool: PoolIdentifier): string[] {
   return Object.keys(addressBook[getUmbrellaFromPool(pool)].UMBRELLA_STAKE_ASSETS);
 }

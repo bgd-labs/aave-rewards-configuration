@@ -19,6 +19,7 @@ import {
   CHAIN_TO_CHAIN_ID,
   getTokenSymbols,
   getDefaultCollector,
+  getMaxEmissionsPerSecondToReadable,
 } from '../common';
 
 export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<UmbrellaRewardsUpdate[]> {
@@ -57,6 +58,15 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
   const input: UmbrellaRewardsUpdate[] = [];
 
   for (const reward of rewardsAddresses) {
+    const currentConfig = await rewardsControllerContract.read.getRewardData([assetAddress, reward.asset]);
+    console.log('----------------------------------------------------------');
+    console.log(`Current on-chain configuration for the reward: ${reward.symbol} and asset: ${asset}:`);
+    console.log(`maxEmissionsPerSecond: ${currentConfig.maxEmissionPerSecond} (${
+      await getMaxEmissionsPerSecondToReadable(chainId, reward.asset, Number(currentConfig.maxEmissionPerSecond))
+    })`);
+    console.log(`distributionEnd: ${currentConfig.distributionEnd} (${new Date(Number(currentConfig.distributionEnd) * 1000).toDateString()})`);
+    console.log('----------------------------------------------------------');
+
     const maxEmissionsPerSecondChoice = await select({
       message: `Please input the maxEmissionsPerSecond you want to configure for the reward: ${reward.symbol} and asset: ${asset}`,
       choices: [

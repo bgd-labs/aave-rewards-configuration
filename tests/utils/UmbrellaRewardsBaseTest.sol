@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from 'forge-std/Test.sol';
+import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 import {IRewardsController} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsController.sol';
 import {IRewardsStructs} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsStructs.sol';
 import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
@@ -42,22 +43,36 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     calldatas = new bytes[](config.length);
     targets = new address[](config.length);
 
+    console.log('------------------------------------------------------------------------------------');
+    console.log(
+        'Safe Address',
+        IPermissionedPayloadsController(network.permissionedPayloadsController).payloadsManager()
+      );
+    console.log('Target Contract', network.permissionedPayloadsController);
+    console.log('------------------------------------------------------------------------------------');
+
     for (uint256 i = 0; i < config.length; i++) {
       RewardConfig memory cfg = config[i];
+
+      IRewardsStructs.RewardDataExternal memory currentRewardData;
+      bool maxEmissionsSame;
+      bool distributionEndSame;
 
       if (
         cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT ||
         cfg.distributionEnd == EngineFlags.KEEP_CURRENT
       ) {
-        IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
+        currentRewardData = IRewardsController(
           network.rewardsController
         ).getRewardData(cfg.asset, cfg.reward);
 
         if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
+          maxEmissionsSame = true;
           cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
         }
 
         if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
+          distributionEndSame = true;
           cfg.distributionEnd = currentRewardData.distributionEnd;
         }
 
@@ -96,13 +111,21 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         _createAction(network.rewardsController, rewardsCalldata)
       );
 
-      console.log(
-        'Safe Address',
-        IPermissionedPayloadsController(network.permissionedPayloadsController).payloadsManager()
-      );
-      console.log('Target Contract', network.permissionedPayloadsController);
-      console.log('Calldata ', i, ' :');
+      console.log('Changelog for reward', IERC20(cfg.reward).symbol(), ' asset', IERC20(cfg.asset).symbol());
+      if (maxEmissionsSame) {
+        console.log('maxEmissionsPerSecond: UNCHANGED');
+      } else {
+        console.log('maxEmissionsPerSecond: Changed from', currentRewardData.maxEmissionPerSecond, ' to', cfg.maxEmissionPerSecond);
+      }
+      if (distributionEndSame) {
+        console.log('distributionEnd: UNCHANGED');
+      } else {
+        console.log('distributionEnd: Changed from', currentRewardData.distributionEnd, ' to', cfg.distributionEnd);
+      }
+
+      console.log('Calldata: ');
       console.logBytes(calldatas[i]);
+      console.log('');
     }
   }
 
