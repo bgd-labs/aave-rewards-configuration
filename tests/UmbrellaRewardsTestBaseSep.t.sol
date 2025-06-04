@@ -8,9 +8,7 @@ import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/
 import {UmbrellaBaseSepoliaConfig} from './utils/networkConfig/UmbrellaBaseSepoliaConfig.sol';
 
 /**
- * private-key: forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_sendTransactionViaPrivateKey -vv
- * ledger: forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_sendTransactionViaLedger -vv
- * emit Calldata only: forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_logCalldatas -vv
+ * emit calldata: forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_logCalldatas -vv
  */
 contract UmbrellaRewardsTestBaseSep is UmbrellaRewardsBaseTest, UmbrellaBaseSepoliaConfig {
   function configureUpdates() public view override returns (RewardConfig[] memory) {

@@ -8,8 +8,6 @@ import {UmbrellaEthereumConfig} from './utils/networkConfig/UmbrellaEthereumConf
 import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
 
 /**
- * private-key: forge test --mp tests/UmbrellaRewardsTestEth.t.sol --mt test_sendTransactionViaPrivateKey -vv
- * ledger: forge test --mp tests/UmbrellaRewardsTestEth.t.sol --mt test_sendTransactionViaLedger -vv
  * emit calldata only: forge test --mp tests/UmbrellaRewardsTestEth.t.sol --mt test_logCalldatas -vv
  */
 contract UmbrellaRewardsTestEth is UmbrellaRewardsBaseTest, UmbrellaEthereumConfig {

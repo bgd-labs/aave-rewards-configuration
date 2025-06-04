@@ -34,7 +34,7 @@ The following reward params can be updated for an Umbrella Asset and Reward pair
 _Please note: Before updating the umbrella rewards, make sure the rewardPayer (default is AaveCollector) has sufficient funds and approval for the new configuration and only the above params are allowed to be updated via the PermissionedPayloadsController infra, and other params like targetLiquidity can only be changed by the Aave Governance_
 
 ### How to use the cli generator to update Umbrella Rewards:
-This repository includes a cli generator to help you bootstrap the required scripts for updating umbrella rewards. 
+This repository includes a cli generator to help you bootstrap the required scripts for updating umbrella rewards.
 To run the generator you need to run: `npm run generate`
 
 To get a full list of available commands run: `npm run generate -- --help`
@@ -85,15 +85,9 @@ Fetching information for updating existing umbrella rewards on AaveV3BaseSepolia
 Scripts generated...
 ```
 
-Via the CLI generator, scripts will be generated in the `./tests` directory which can be used to send transaction to the gnosis safe (ex. ALC Multi-sig) and emit calldata which can be manaully used to plug into the safe UI. 
+Via the CLI generator, scripts will be generated in the `./tests` directory which can be used to emit calldata which can be manually used to plug into the safe UI.
 
-- To only emit calldata without sending any tx, following command could be run: `forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_logCalldatas -vv`.
-  
-- To propose tx to the gnosis safe backend, please have either the following vars in your `.env`: `PRIVATE_KEY` `SENDER` if you wish to propose via private-key or `MNEMONIC_INDEX` `LEDGER_SENDER` if it via the ledger. The address in `.env` should be a proposer of the ALC Muti-sig to do this else please use the calldata method. The following is an example command to be used to send tx via: 
-  - private-key `forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_sendTransactionViaPrivateKey -vv`
-  - ledger `forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_sendTransactionViaLedger -vv`
-    
-_Please note: the exact command will be generated on the comments of your tests, sending directly to the safe backend via private-key and ledger is an expirmental feature and might have some limitations._
+- To only emit calldata without sending any tx, following command could be run: `forge test --mp tests/UmbrellaRewardsTestBaseSep.t.sol --mt test_logCalldatas -vv`. Please note: the exact command will be generated on the comments of your tests
 
 <br/>
 

@@ -2,20 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from 'forge-std/Test.sol';
-import {strings} from 'solidity-stringutils/src/strings.sol';
 import {IRewardsController} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsController.sol';
 import {IRewardsStructs} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsStructs.sol';
 import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
-import {Safe} from 'safe-utils/Safe.sol';
 
 import {IPermissionedPayloadsController, PayloadsControllerUtils} from '../../src/interfaces/IPermissionedPayloadsController.sol';
 
 abstract contract UmbrellaRewardsBaseTest is Test {
-  using Safe for *;
-  using strings for *;
-
-  Safe.Client internal _safe;
-
   struct RewardConfig {
     address asset;
     address reward;
@@ -32,38 +25,11 @@ abstract contract UmbrellaRewardsBaseTest is Test {
 
   function setUp() public {
     vm.createSelectFork(networkConfig().networkName);
-
-    address payloadsManager = IPermissionedPayloadsController(
-      networkConfig().permissionedPayloadsController
-    ).payloadsManager();
-    _safe.initialize(payloadsManager);
   }
 
   function configureUpdates() public virtual returns (RewardConfig[] memory);
 
   function networkConfig() public virtual returns (NetworkConfig memory);
-
-  function test_sendTransactionViaPrivateKey() public {
-    _skipTestIfCI();
-    (address[] memory targets, bytes[] memory calldatas) = _getCalldata();
-    vm.rememberKey(vm.envUint('PRIVATE_KEY'));
-
-    for (uint256 i = 0; i < targets.length; i++) {
-      _safe.proposeTransaction(targets[i], calldatas[i], vm.envAddress('SENDER'));
-    }
-  }
-
-  function test_sendTransactionViaLedger() public {
-    _skipTestIfCI();
-    (address[] memory targets, bytes[] memory calldatas) = _getCalldata();
-
-    _safe.proposeTransactions(
-      targets,
-      calldatas,
-      vm.envAddress('LEDGER_SENDER'),
-      string.concat("m/44'/60'/0'/0/", vm.envString('MNEMONIC_INDEX'))
-    );
-  }
 
   function test_logCalldatas() public {
     _getCalldata();
@@ -153,11 +119,5 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       signature: '',
       callData: txCalldata
     });
-  }
-
-  function _skipTestIfCI() internal {
-    if (keccak256(abi.encodePacked(vm.envString('FOUNDRY_PROFILE'))) == keccak256(abi.encodePacked('ci'))) {
-      vm.skip(true);
-    }
   }
 }

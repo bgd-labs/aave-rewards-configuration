@@ -4,9 +4,6 @@
 [submodule "lib/aave-address-book"]
 	path = lib/aave-address-book
 	url = https://github.com/bgd-labs/aave-address-book
-[submodule "lib/safe-utils"]
-	path = lib/safe-utils
-	url = https://github.com/Recon-Fuzz/safe-utils
 [submodule "lib/aave-umbrella"]
 	path = lib/aave-umbrella
 	url = https://github.com/aave-dao/aave-umbrella
