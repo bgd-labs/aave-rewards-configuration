@@ -9,7 +9,7 @@ This repository contains examples and CLI generator on how to configure Umbrella
 
 ## Umbrella Rewards
 
-Detailed information to update umbrella rewards can be found [HERE](./docs/UmbrellaRewards.md).
+Detailed information to update Umbrella rewards can be found [HERE](./docs/UmbrellaRewards.md).
 
 ## Liquidity Mining
 
