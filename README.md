@@ -34,4 +34,4 @@ forge test
 
 Copyright © 2025 BGD Labs
 
-The default license of this repository is [MIT](./LICENSE)
+This repository is covered by [MIT](./LICENSE) license.
