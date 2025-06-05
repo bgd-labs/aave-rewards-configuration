@@ -1,4 +1,4 @@
-## Activating / Updating Liquidity Mining on Aave V3:
+## Activating / Updating incentives on Aave V3:
 
 <img width="924" alt="Screenshot 2023-04-10 at 11 27 10 AM" src="https://user-images.githubusercontent.com/22850280/230836420-7b5c4bba-d851-4258-90c6-602d33eaf845.png">
 
