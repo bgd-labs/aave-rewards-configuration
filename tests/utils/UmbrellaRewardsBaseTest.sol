@@ -2,20 +2,14 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from 'forge-std/Test.sol';
-import {strings} from 'solidity-stringutils/src/strings.sol';
+import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 import {IRewardsController} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsController.sol';
 import {IRewardsStructs} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsStructs.sol';
 import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
-import {Safe} from 'safe-utils/Safe.sol';
 
 import {IPermissionedPayloadsController, PayloadsControllerUtils} from '../../src/interfaces/IPermissionedPayloadsController.sol';
 
 abstract contract UmbrellaRewardsBaseTest is Test {
-  using Safe for *;
-  using strings for *;
-
-  Safe.Client internal _safe;
-
   struct RewardConfig {
     address asset;
     address reward;
@@ -32,41 +26,47 @@ abstract contract UmbrellaRewardsBaseTest is Test {
 
   function setUp() public {
     vm.createSelectFork(networkConfig().networkName);
-
-    address payloadsManager = IPermissionedPayloadsController(
-      networkConfig().permissionedPayloadsController
-    ).payloadsManager();
-    _safe.initialize(payloadsManager);
   }
 
   function configureUpdates() public virtual returns (RewardConfig[] memory);
 
   function networkConfig() public virtual returns (NetworkConfig memory);
 
-  function test_sendTransactionViaPrivateKey() public {
-    _skipTestIfCI();
-    (address[] memory targets, bytes[] memory calldatas) = _getCalldata();
-    vm.rememberKey(vm.envUint('PRIVATE_KEY'));
-
-    for (uint256 i = 0; i < targets.length; i++) {
-      _safe.proposeTransaction(targets[i], calldatas[i], vm.envAddress('SENDER'));
-    }
-  }
-
-  function test_sendTransactionViaLedger() public {
-    _skipTestIfCI();
-    (address[] memory targets, bytes[] memory calldatas) = _getCalldata();
-
-    _safe.proposeTransactions(
-      targets,
-      calldatas,
-      vm.envAddress('LEDGER_SENDER'),
-      string.concat("m/44'/60'/0'/0/", vm.envString('MNEMONIC_INDEX'))
-    );
-  }
-
   function test_logCalldatas() public {
     _getCalldata();
+  }
+
+  function test_sanity() public {
+    RewardConfig[] memory config = configureUpdates();
+
+    for (uint256 i = 0; i < config.length; i++) {
+      RewardConfig memory cfg = config[i];
+      IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
+        networkConfig().rewardsController
+      ).getRewardData(cfg.asset, cfg.reward);
+
+      if (
+        cfg.maxEmissionPerSecond != EngineFlags.KEEP_CURRENT &&
+        currentRewardData.maxEmissionPerSecond != 0
+      ) {
+        vm.assertApproxEqRel(
+          cfg.maxEmissionPerSecond,
+          currentRewardData.maxEmissionPerSecond,
+          0.75e18, // 75%
+          'maxEmissionPerSecond change more than 75% than currently configured'
+        );
+      }
+
+      if (
+        cfg.distributionEnd != EngineFlags.KEEP_CURRENT && currentRewardData.distributionEnd != 0
+      ) {
+        vm.assertLt(
+          cfg.distributionEnd,
+          currentRewardData.distributionEnd + 366 days,
+          'distributionEnd increased by more than 1 year than currently configured'
+        );
+      }
+    }
   }
 
   function _getCalldata() internal returns (address[] memory targets, bytes[] memory calldatas) {
@@ -76,28 +76,40 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     calldatas = new bytes[](config.length);
     targets = new address[](config.length);
 
+    console.log(
+      '------------------------------------------------------------------------------------'
+    );
+    console.log(
+      'Safe Address',
+      IPermissionedPayloadsController(network.permissionedPayloadsController).payloadsManager()
+    );
+    console.log('Target Contract', network.permissionedPayloadsController);
+    console.log(
+      '------------------------------------------------------------------------------------'
+    );
+
     for (uint256 i = 0; i < config.length; i++) {
       RewardConfig memory cfg = config[i];
 
-      if (
-        cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT ||
-        cfg.distributionEnd == EngineFlags.KEEP_CURRENT
-      ) {
-        IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
-          network.rewardsController
-        ).getRewardData(cfg.asset, cfg.reward);
+      bool maxEmissionsSame;
+      bool distributionEndSame;
 
-        if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
-          cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
-        }
+      IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
+        network.rewardsController
+      ).getRewardData(cfg.asset, cfg.reward);
 
-        if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
-          cfg.distributionEnd = currentRewardData.distributionEnd;
-        }
+      if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
+        maxEmissionsSame = true;
+        cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
+      }
 
-        if (cfg.rewardPayer == EngineFlags.KEEP_CURRENT_ADDRESS) {
-          revert('REWARD_PAYER_CANNOT_BE_KEEP_CURRENT');
-        }
+      if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
+        distributionEndSame = true;
+        cfg.distributionEnd = currentRewardData.distributionEnd;
+      }
+
+      if (cfg.rewardPayer == EngineFlags.KEEP_CURRENT_ADDRESS) {
+        revert('REWARD_PAYER_CANNOT_BE_KEEP_CURRENT');
       }
 
       IRewardsStructs.RewardSetupConfig[]
@@ -131,12 +143,35 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       );
 
       console.log(
-        'Safe Address',
-        IPermissionedPayloadsController(network.permissionedPayloadsController).payloadsManager()
+        'Changelog for reward',
+        IERC20(cfg.reward).symbol(),
+        ' asset',
+        IERC20(cfg.asset).symbol()
       );
-      console.log('Target Contract', network.permissionedPayloadsController);
-      console.log('Calldata ', i, ' :');
+      if (maxEmissionsSame) {
+        console.log('maxEmissionsPerSecond: UNCHANGED');
+      } else {
+        console.log(
+          'maxEmissionsPerSecond: Changed from',
+          currentRewardData.maxEmissionPerSecond,
+          ' to',
+          cfg.maxEmissionPerSecond
+        );
+      }
+      if (distributionEndSame) {
+        console.log('distributionEnd: UNCHANGED');
+      } else {
+        console.log(
+          'distributionEnd: Changed from',
+          currentRewardData.distributionEnd,
+          ' to',
+          cfg.distributionEnd
+        );
+      }
+
+      console.log('Calldata: ');
       console.logBytes(calldatas[i]);
+      console.log('');
     }
   }
 
@@ -153,11 +188,5 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       signature: '',
       callData: txCalldata
     });
-  }
-
-  function _skipTestIfCI() internal {
-    if (keccak256(abi.encodePacked(vm.envString('FOUNDRY_PROFILE'))) == keccak256(abi.encodePacked('ci'))) {
-      vm.skip(true);
-    }
   }
 }

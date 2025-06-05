@@ -136,7 +136,9 @@ if (options.configFile) {
       await updateUmbrellaRewards.build({
         options,
         pool: options.pool,
-        cfg: poolConfigs[options.pool]!.configs[FEATURE.UPDATE_UMBRELLA_REWARDS] as UmbrellaRewardsUpdate[],
+        cfg: poolConfigs[options.pool]!.configs[
+          FEATURE.UPDATE_UMBRELLA_REWARDS
+        ] as UmbrellaRewardsUpdate[],
         cache: poolConfigs[options.pool]!.cache,
       })
     );
@@ -152,10 +154,10 @@ if (options.configFile) {
     choices:
       options.feature === FEATURE.UPDATE_UMBRELLA_REWARDS
         ? [
-            { name: 'AaveV3Ethereum', value: 'AaveV3Ethereum' },
-            { name: 'AaveV3BaseSepolia', value: 'AaveV3BaseSepolia' },
+            {name: 'AaveV3Ethereum', value: 'AaveV3Ethereum'},
+            {name: 'AaveV3BaseSepolia', value: 'AaveV3BaseSepolia'},
           ]
-        : POOLS.map((v) => ({ name: v, value: v })),
+        : POOLS.map((v) => ({name: v, value: v})),
   });
 
   if (!options.title) {

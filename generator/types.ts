@@ -63,7 +63,12 @@ export interface FeatureModule<T extends {} = {}> {
   description: string;
   value: FEATURE;
   cli: (args: {options: Options; pool: PoolIdentifier; cache: PoolCache}) => Promise<T>;
-  build: (args: {options: Options; pool: PoolIdentifier; cache: PoolCache; cfg: T}) => Promise<CodeArtifact>;
+  build: (args: {
+    options: Options;
+    pool: PoolIdentifier;
+    cache: PoolCache;
+    cfg: T;
+  }) => Promise<CodeArtifact>;
 }
 
 export type ConfigFile = {

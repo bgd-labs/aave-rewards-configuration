@@ -1,5 +1,5 @@
 import * as addressBook from '@bgd-labs/aave-address-book';
-import {IUmbrellaRewardsController_ABI} from '@bgd-labs/aave-address-book/abis'
+import {IUmbrellaRewardsController_ABI} from '@bgd-labs/aave-address-book/abis';
 import {CHAIN_ID_CLIENT_MAP} from '@bgd-labs/js-utils';
 import {select} from '@inquirer/prompts';
 import {Hex, getContract} from 'viem';
@@ -19,6 +19,7 @@ import {
   CHAIN_TO_CHAIN_ID,
   getTokenSymbols,
   getDefaultCollector,
+  getMaxEmissionsPerSecondToReadable,
 } from '../common';
 
 export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<UmbrellaRewardsUpdate[]> {
@@ -38,7 +39,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     });
     assetAddress = asset as Hex;
   } else {
-    assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN
+    assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN;
   }
 
   const rewardsControllerContract = getContract({
@@ -46,7 +47,9 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     client: CHAIN_ID_CLIENT_MAP[chainId],
     address: addressBook[umbrella].UMBRELLA_REWARDS_CONTROLLER,
   });
-  const availableRewardAddresses = await rewardsControllerContract.read.getAllRewards([assetAddress]);
+  const availableRewardAddresses = await rewardsControllerContract.read.getAllRewards([
+    assetAddress,
+  ]);
   const symbols = await getTokenSymbols(availableRewardAddresses as Hex[], chainId);
 
   const rewardsAddresses = await addressCheckboxPromptWithSymbol(
@@ -57,6 +60,30 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
   const input: UmbrellaRewardsUpdate[] = [];
 
   for (const reward of rewardsAddresses) {
+    const currentConfig = await rewardsControllerContract.read.getRewardData([
+      assetAddress,
+      reward.asset,
+    ]);
+    console.log('----------------------------------------------------------');
+    console.log(
+      `Current on-chain configuration for the reward: ${reward.symbol} and asset: ${asset}:`
+    );
+    console.log(
+      `maxEmissionsPerSecond: ${
+        currentConfig.maxEmissionPerSecond
+      } (${await getMaxEmissionsPerSecondToReadable(
+        chainId,
+        reward.asset,
+        Number(currentConfig.maxEmissionPerSecond)
+      )})`
+    );
+    console.log(
+      `distributionEnd: ${currentConfig.distributionEnd} (${new Date(
+        Number(currentConfig.distributionEnd) * 1000
+      ).toDateString()})`
+    );
+    console.log('----------------------------------------------------------');
+
     const maxEmissionsPerSecondChoice = await select({
       message: `Please input the maxEmissionsPerSecond you want to configure for the reward: ${reward.symbol} and asset: ${asset}`,
       choices: [
@@ -68,7 +95,10 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
 
     let maxEmissionsPerSecond: string;
     if (maxEmissionsPerSecondChoice == 'units') {
-      const tokenUnits = await numberPrompt({message: 'Enter the token units for maxEmissionsPerSecond', required: true,});
+      const tokenUnits = await numberPrompt({
+        message: 'Enter the token units for maxEmissionsPerSecond',
+        required: true,
+      });
       const days = await numberPromptInDays({
         message: 'Enter the days for maxEmissionsPerSecond:',
         required: true,
@@ -76,9 +106,12 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
       const tokenDecimals = await getTokenDecimals(reward.asset, chainId);
       maxEmissionsPerSecond = `uint256(${tokenUnits} * 1e${tokenDecimals}) / ${days} days`;
     } else if (maxEmissionsPerSecondChoice == 'raw') {
-      maxEmissionsPerSecond = await numberPromptNoTransform({message: 'Enter the maxEmissionsPerSecond raw value', required: true}, {
-        skipTransform: true,
-      });
+      maxEmissionsPerSecond = await numberPromptNoTransform(
+        {message: 'Enter the maxEmissionsPerSecond raw value', required: true},
+        {
+          skipTransform: true,
+        }
+      );
     } else {
       maxEmissionsPerSecond = 'EngineFlags.KEEP_CURRENT';
     }
@@ -98,13 +131,16 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
         message: 'Enter the distributionEnd in days from current timestamp:',
         required: true,
       });
-      distributionEnd = `block.timestamp + ${distributionEnd} days`
+      distributionEnd = `block.timestamp + ${distributionEnd} days`;
     } else if (distributionEndChoice == 'raw') {
-      distributionEnd = await numberPromptNoTransform({message: 'Enter the distributionEnd in unix timestamp', required: true}, {
-        skipTransform: true,
-      });
+      distributionEnd = await numberPromptNoTransform(
+        {message: 'Enter the distributionEnd in unix timestamp', required: true},
+        {
+          skipTransform: true,
+        }
+      );
     } else {
-      distributionEnd = 'EngineFlags.KEEP_CURRENT'
+      distributionEnd = 'EngineFlags.KEEP_CURRENT';
     }
 
     let rewardPayer = await select({
@@ -126,7 +162,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
       reward: reward.asset,
       rewardPayer,
       maxEmissionsPerSecond,
-      distributionEnd
+      distributionEnd,
     });
   }
 
@@ -142,7 +178,10 @@ export const updateUmbrellaRewards: FeatureModule<UmbrellaRewardsUpdate[]> = {
     return response;
   },
   async build({pool, cfg}) {
-    const rewardSymbols = await getTokenSymbols(cfg.map(s => s.reward as Hex), CHAIN_TO_CHAIN_ID[getPoolChain(pool)]);
+    const rewardSymbols = await getTokenSymbols(
+      cfg.map((s) => s.reward as Hex),
+      CHAIN_TO_CHAIN_ID[getPoolChain(pool)]
+    );
     const response: CodeArtifact = {
       code: {
         fn: [

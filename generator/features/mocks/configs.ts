@@ -50,10 +50,12 @@ export const liquidityMiningUpdateConfig: LiquidityMiningUpdate = {
   whaleExpectedReward: '32.4',
 };
 
-export const umbrellaRewardsUpdateConfig: UmbrellaRewardsUpdate[] = [{
-  asset: 'STK_WETH_V1',
-  reward: '0x73a5bB60b0B0fc35710DDc0ea9c407031E31Bdbb',
-  rewardPayer: '0x24f321Cd3742B7a191e5ED7cE1be8059DEe91424',
-  maxEmissionsPerSecond: 'EngineFlags.KEEP_CURRENT',
-  distributionEnd: 'block.timestamp + 120 days'
-}];
+export const umbrellaRewardsUpdateConfig: UmbrellaRewardsUpdate[] = [
+  {
+    asset: 'STK_WETH_V1',
+    reward: '0x73a5bB60b0B0fc35710DDc0ea9c407031E31Bdbb',
+    rewardPayer: '0x24f321Cd3742B7a191e5ED7cE1be8059DEe91424',
+    maxEmissionsPerSecond: 'EngineFlags.KEEP_CURRENT',
+    distributionEnd: 'block.timestamp + 120 days',
+  },
+];

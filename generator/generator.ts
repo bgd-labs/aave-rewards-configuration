@@ -38,18 +38,15 @@ export async function generateFiles(options: Options, poolConfigs: PoolConfigs):
     } else if (options.feature == FEATURE.UPDATE_LM) {
       template = liquidityMiningUpdateTemplate(options, poolConfigs[pool]!, pool);
     } else {
-      template = umbrellaRewardsUpdateTemplate(options, poolConfigs[pool]!, pool)
+      template = umbrellaRewardsUpdateTemplate(options, poolConfigs[pool]!, pool);
     }
 
     return {
       pool,
-      payloadTest: await prettier.format(
-        template,
-        {
-          ...prettierSolCfg,
-          filepath: 'foo.sol',
-        }
-      ),
+      payloadTest: await prettier.format(template, {
+        ...prettierSolCfg,
+        filepath: 'foo.sol',
+      }),
       contractName: contractName,
     };
   }

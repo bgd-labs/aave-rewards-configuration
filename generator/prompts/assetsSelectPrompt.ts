@@ -1,6 +1,12 @@
 import {isAddress, Hex} from 'viem';
 import {checkbox, select} from '@inquirer/prompts';
-import {getAssets, getSupplyAssets, getSupplyBorrowAssets, getUmbrellaFromPool, getUmbrellaStkAssets} from '../common';
+import {
+  getAssets,
+  getSupplyAssets,
+  getSupplyBorrowAssets,
+  getUmbrellaFromPool,
+  getUmbrellaStkAssets,
+} from '../common';
 import {PoolIdentifier} from '../types';
 import {GenericPoolPrompt} from './types';
 
@@ -20,11 +26,15 @@ export async function assetsSelectPrompt({pool, message}: GenericPoolPrompt) {
   });
 }
 
-export async function addressCheckboxPromptWithSymbol(assets: Hex[], symbols: string[], message: string) {
+export async function addressCheckboxPromptWithSymbol(
+  assets: Hex[],
+  symbols: string[],
+  message: string
+) {
   return await checkbox({
     message,
     choices: assets.map((asset, i) => ({name: symbols[i], value: {asset, symbol: symbols[i]}})),
-    required: true
+    required: true,
   });
 }
 
