@@ -11,7 +11,7 @@ This repository contains examples and CLI generator on how to configure Umbrella
 
 Detailed information to update Umbrella rewards can be found [HERE](./docs/UmbrellaRewards.md).
 
-## Liquidity Mining
+## Aave v3 incentives
 
 Detailed information to activate / update liquidity mining can be found [HERE](./docs/LiquidityMining.md).
 
