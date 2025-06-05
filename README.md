@@ -13,7 +13,7 @@ Detailed information to update Umbrella rewards can be found [HERE](./docs/Umbre
 
 ## Aave v3 incentives
 
-Detailed information to activate / update liquidity mining can be found [HERE](./docs/LiquidityMining.md).
+Detailed information to activate / update Aave v3 incentives (supply/borrow) can be found [HERE](./docs/LiquidityMining.md).
 
 <br/>
 
