@@ -79,7 +79,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
       message: `Please input the maxEmissionsPerSecond you want to configure for the reward: ${reward.symbol} and asset: ${asset}`,
       choices: [
         {name: 'Keep maxEmissionsPerSecond the same as current', value: 'current'},
-        {name: 'Enter maxEmissionsPerSecond in token units / days', value: 'units'},
+        {name: 'Enter maxEmissionsPerSecond in token units / 180 days', value: 'units'},
         {name: 'Enter raw maxEmissionsPerSecond', value: 'raw'},
       ],
     });
@@ -129,20 +129,8 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     } else {
       distributionEnd = 'EngineFlags.KEEP_CURRENT';
     }
-
-    let rewardPayer = await select({
-      message: 'Enter the address of the rewards payer you want to configure',
-      choices: [
-        {name: 'Aave Collector (Default)', value: getDefaultCollector(pool)},
-        {name: 'Custom Address (Enter Manually)', value: 'custom'},
-      ],
-    });
-    if (rewardPayer == 'custom') {
-      rewardPayer = await addressPrompt({
-        message: 'Enter the address of the new rewards payer you want to configure:',
-        required: true,
-      });
-    }
+    // default rewardPayer to the collector
+    const rewardPayer = getDefaultCollector(pool);
 
     input.push({
       asset,
