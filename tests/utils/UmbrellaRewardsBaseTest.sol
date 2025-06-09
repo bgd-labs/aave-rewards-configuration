@@ -2,6 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from 'forge-std/Test.sol';
+import {stdMath} from 'forge-std/StdMath.sol';
 import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 import {IRewardsController} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsController.sol';
 import {IRewardsStructs} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsStructs.sol';
@@ -143,29 +144,36 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       );
 
       console.log(
-        'Changelog for reward',
+        'Changelog for reward: %s and asset: %s',
         IERC20(cfg.reward).symbol(),
-        ' asset',
         IERC20(cfg.asset).symbol()
       );
       if (maxEmissionsSame) {
-        console.log('maxEmissionsPerSecond: UNCHANGED');
+        console.log('maxEmissionsPerSecond:', currentRewardData.maxEmissionPerSecond, '(UNCHANGED)');
       } else {
+        uint256 percentChange = stdMath.percentDelta(currentRewardData.maxEmissionPerSecond, cfg.maxEmissionPerSecond) / 1e16;
         console.log(
-          'maxEmissionsPerSecond: Changed from',
+          'maxEmissionsPerSecond: Changed from %s to %s (Change delta: ~%s%)',
           currentRewardData.maxEmissionPerSecond,
-          ' to',
-          cfg.maxEmissionPerSecond
+          cfg.maxEmissionPerSecond,
+          percentChange
         );
       }
       if (distributionEndSame) {
-        console.log('distributionEnd: UNCHANGED');
+        console.log('distributionEnd:' , _getUnixTsToReadable(currentRewardData.distributionEnd), '(UNCHANGED)');
       } else {
         console.log(
-          'distributionEnd: Changed from',
-          currentRewardData.distributionEnd,
-          ' to',
-          cfg.distributionEnd
+          string(abi.encodePacked(
+            'distributionEnd: Changed from ',
+            vm.toString(currentRewardData.distributionEnd),
+            ' (',
+            _getUnixTsToReadable(currentRewardData.distributionEnd),
+            ') to ',
+            vm.toString(cfg.distributionEnd),
+            ' (',
+            _getUnixTsToReadable(cfg.distributionEnd),
+            ')'
+          ))
         );
       }
 
@@ -188,5 +196,17 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       signature: '',
       callData: txCalldata
     });
+  }
+
+  function _getUnixTsToReadable(uint256 timestamp) internal returns (string memory) {
+    string[] memory getDateCommand = new string[](3);
+    getDateCommand[0] = 'python3';
+    getDateCommand[1] = '-c';
+    getDateCommand[2] = string(abi.encodePacked(
+      'import datetime; print(datetime.datetime.fromtimestamp(',
+      vm.toString(timestamp),
+      ').isoformat())'
+    ));
+    return string(vm.ffi(getDateCommand));
   }
 }
