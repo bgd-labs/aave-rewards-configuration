@@ -31,16 +31,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     pool,
     required: true,
   });
-  let assetAddress: Hex;
-  if (asset == 'custom') {
-    asset = await addressPrompt({
-      message: 'Enter the address of the umbrella asset manually:',
-      required: true,
-    });
-    assetAddress = asset as Hex;
-  } else {
-    assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN;
-  }
+  const assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN;
 
   const rewardsControllerContract = getContract({
     abi: IUmbrellaRewardsController_ABI,
@@ -96,15 +87,11 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     let maxEmissionsPerSecond: string;
     if (maxEmissionsPerSecondChoice == 'units') {
       const tokenUnits = await numberPrompt({
-        message: 'Enter the token units for maxEmissionsPerSecond',
-        required: true,
-      });
-      const days = await numberPromptInDays({
-        message: 'Enter the days for maxEmissionsPerSecond:',
+        message: 'Enter the token units for maxEmissionsPerSecond per 180 days',
         required: true,
       });
       const tokenDecimals = await getTokenDecimals(reward.asset, chainId);
-      maxEmissionsPerSecond = `uint256(${tokenUnits} * 1e${tokenDecimals}) / ${days} days`;
+      maxEmissionsPerSecond = `uint256(${tokenUnits} * 1e${tokenDecimals}) / 180 days`;
     } else if (maxEmissionsPerSecondChoice == 'raw') {
       maxEmissionsPerSecond = await numberPromptNoTransform(
         {message: 'Enter the maxEmissionsPerSecond raw value', required: true},
