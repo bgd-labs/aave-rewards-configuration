@@ -154,7 +154,8 @@ export function getDate() {
   const years = date.getFullYear();
   const months = date.getMonth() + 1; // it's js so months are 0 indexed
   const day = date.getDate();
-  return `${years}${months <= 9 ? '0' : ''}${months}${day <= 9 ? '0' : ''}${day}`;
+  const time = `${date.getHours()}${date.getMinutes()}${date.getHours()}`;
+  return `${years}${months <= 9 ? '0' : ''}${months}${day <= 9 ? '0' : ''}${day}_${time}`;
 }
 
 /**
@@ -172,7 +173,7 @@ export function generateFolderName(options: Options) {
   } else {
     featureString = '_UmbrellaUpdate';
   }
-  return `${options.date}${featureString}${options.pool}_${options.shortName}`;
+  return `${options.date}${featureString}${options.pool}`;
 }
 
 /**
@@ -190,7 +191,6 @@ export function generateContractName(options: Options, pool?: PoolIdentifier) {
   } else {
     name += 'UmbrellaRewardsUpdate';
   }
-  name += `${options.shortName}`;
   name += `_${options.date}`;
   return name;
 }
