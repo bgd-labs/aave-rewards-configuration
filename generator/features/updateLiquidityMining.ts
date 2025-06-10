@@ -108,7 +108,7 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
     const response: LiquidityMiningUpdate = await fetchLiquidityMiningUpdateParams({pool});
     return response;
   },
-  build({pool, cfg}) {
+  async build({pool, cfg}) {
     const response: CodeArtifact = {
       code: {
         constants: [
