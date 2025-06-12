@@ -42,10 +42,12 @@ abstract contract UmbrellaRewardsBaseTest is Test {
 
     for (uint256 i = 0; i < config.length; i++) {
       RewardConfig memory cfg = config[i];
+
       IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
         networkConfig().rewardsController
       ).getRewardData(cfg.asset, cfg.reward);
 
+      // validate maxEmissionPerSecond sanity
       if (
         cfg.maxEmissionPerSecond != EngineFlags.KEEP_CURRENT &&
         currentRewardData.maxEmissionPerSecond != 0
@@ -58,6 +60,7 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         );
       }
 
+      // validate distributionEnd sanity
       if (
         cfg.distributionEnd != EngineFlags.KEEP_CURRENT && currentRewardData.distributionEnd != 0
       ) {
@@ -65,6 +68,40 @@ abstract contract UmbrellaRewardsBaseTest is Test {
           cfg.distributionEnd,
           currentRewardData.distributionEnd + 366 days,
           'distributionEnd increased by more than 1 year than currently configured'
+        );
+      }
+
+      if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
+        cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
+      }
+      if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
+        cfg.distributionEnd = currentRewardData.distributionEnd;
+      }
+
+      uint256 distributionTime = cfg.distributionEnd > block.timestamp ? cfg.distributionEnd - block.timestamp : 0;
+      uint256 rewardAmountRequired = distributionTime * cfg.maxEmissionPerSecond;
+
+      // validate rewardPayer balance
+      vm.assertGe(
+        IERC20(cfg.reward).balanceOf(cfg.rewardPayer),
+        rewardAmountRequired,
+        'reward balance of the rewardPayer is less that the configured emissions'
+      );
+
+      // validate rewardPayer allowance
+      uint256 rewardAllowance = IERC20(cfg.reward).allowance(cfg.rewardPayer, networkConfig().rewardsController);
+      vm.assertGt(rewardAllowance, 0, 'rewardPayer allowance is 0');
+
+      if (rewardAllowance < (rewardAmountRequired * 120) / 100) { // 20% buffer
+        console.log(
+          'Allowance could be running low for reward: %s and asset: %s, please double check the allowance manually.',
+          IERC20(cfg.reward).symbol(),
+          IERC20(cfg.asset).symbol()
+        );
+        console.log(
+          'Current allowance: ~%s units. Minimum needed allowance: ~%s units',
+          rewardAllowance / (10 ** IERC20(cfg.reward).decimals()),
+          rewardAmountRequired / (10 ** IERC20(cfg.reward).decimals())
         );
       }
     }

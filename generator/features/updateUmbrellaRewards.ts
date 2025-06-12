@@ -5,7 +5,6 @@ import {select} from '@inquirer/prompts';
 import {Hex, getContract} from 'viem';
 import {CodeArtifact, FEATURE, FeatureModule} from '../types';
 import {UmbrellaRewardsUpdate} from './types';
-import {addressPrompt} from '../prompts/addressPrompt';
 import {numberPrompt, numberPromptInDays, numberPromptNoTransform} from '../prompts/numberPrompt';
 import {
   umbrellaStkAssetsSelectPrompt,
