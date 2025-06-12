@@ -1,6 +1,6 @@
 import path from 'path';
 import {Command, Option} from 'commander';
-import {CHAIN_TO_CHAIN_ID, getDate, getPoolChain, pascalCase} from './common';
+import {CHAIN_TO_CHAIN_ID, generateFolderName, getDate, getPoolChain} from './common';
 import {input, select} from '@inquirer/prompts';
 import {ConfigFile, FEATURE, Options, POOLS, PoolCache, PoolConfigs, PoolIdentifier} from './types';
 import {generateFiles, writeFiles} from './generator';
@@ -160,18 +160,8 @@ if (options.configFile) {
         : POOLS.map((v) => ({name: v, value: v})),
   });
 
-  if (!options.title) {
-    options.title = await input({
-      message: 'Short title of the rewards program:',
-      validate(input) {
-        if (input.length == 0) return "Your title can't be empty";
-        if (input.trim().length > 80) return 'Your title is to long';
-        return true;
-      },
-    });
-  }
-  options.shortName = pascalCase(options.title);
   options.date = getDate();
+  options.shortName = generateFolderName(options);
 
   if (options.feature === FEATURE.SETUP_LM) {
     await fetchLMSetupOptions(options.pool);
