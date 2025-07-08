@@ -24,3 +24,11 @@ export interface LiquidityMiningUpdate {
   whaleAddress: Hex;
   whaleExpectedReward: string;
 }
+
+export interface UmbrellaRewardsUpdate {
+  asset: string;
+  reward: string;
+  rewardPayer: string;
+  maxEmissionsPerSecond: string;
+  distributionEnd: string;
+}

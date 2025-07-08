@@ -41,7 +41,17 @@ export function prefixWithImports(code: string) {
   if (addressBookImports) {
     imports += addressBookImports;
   }
-
+  if (findMatch(code, 'EngineFlags')) {
+    imports += `import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';\n`;
+  }
+  const umbrellaBaseConfigMatch = code.match(/(Umbrella[A-Za-z]+)Config/);
+  if (umbrellaBaseConfigMatch) {
+    imports += `import {${umbrellaBaseConfigMatch[1]}Config} from '../utils/networkConfig/${umbrellaBaseConfigMatch[1]}Config.sol';\n`;
+  }
+  const umbrellaAssetsMatch = code.match(/(Umbrella[A-Za-z]+)Assets\./);
+  if (umbrellaAssetsMatch) {
+    imports += `import {${umbrellaAssetsMatch[1]}Assets} from 'aave-address-book/${umbrellaAssetsMatch[1]}.sol';\n`;
+  }
   if (findMatch(code, 'IEmissionManager')) {
     imports += `import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';\n`;
   }
@@ -53,6 +63,9 @@ export function prefixWithImports(code: string) {
   }
   if (findMatch(code, 'IAaveIncentivesController')) {
     imports += `import {IAaveIncentivesController} from '../src/interfaces/IAaveIncentivesController.sol';\n`;
+  }
+  if (findMatch(code, 'UmbrellaRewardsBaseTest')) {
+    imports += `import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';\n`;
   }
 
   return imports + code;
