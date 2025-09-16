@@ -35,10 +35,10 @@
     js-tokens "^4.0.0"
     picocolors "^1.0.0"
 
-"@bgd-labs/aave-address-book@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/@bgd-labs/aave-address-book/-/aave-address-book-4.0.0.tgz"
-  integrity sha512-OCeLg2Q4vL45SVU/nkBETGheYnUbbj1LvCwNR3TeI7MboESIcspoXJbiQWOeyJA6f9Uzo6+k3pa/KtK329gMww==
+"@bgd-labs/aave-address-book@4.22.2":
+  version "4.22.2"
+  resolved "https://registry.npmjs.org/@bgd-labs/aave-address-book/-/aave-address-book-4.22.2.tgz"
+  integrity sha512-xoeyQ2ZrGuHbvm3e8K09Lc51CJKpKRDUyaGWk1yrfRRT4Yn8ipMMxRxhlHIwtN6K0GAgp6cyjG8+CNfdFLMaQg==
 
 "@bgd-labs/aave-address-book@^3.0.0":
   version "3.7.0"

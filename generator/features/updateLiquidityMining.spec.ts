@@ -5,8 +5,8 @@ import {FEATURE, PoolConfigs} from '../types';
 import {updateLiquidityMining} from './updateLiquidityMining';
 
 describe('feature: updateLiquidityMining', () => {
-  it('should return reasonable code', () => {
-    const output = updateLiquidityMining.build({
+  it('should return reasonable code', async () => {
+    const output = await updateLiquidityMining.build({
       options: MOCK_OPTIONS_UPDATE,
       pool: 'AaveV3EthereumLido',
       cfg: liquidityMiningUpdateConfig,
@@ -20,7 +20,7 @@ describe('feature: updateLiquidityMining', () => {
       [MOCK_OPTIONS_UPDATE.pool]: {
         pool: MOCK_OPTIONS_UPDATE.pool,
         artifacts: [
-          updateLiquidityMining.build({
+          await updateLiquidityMining.build({
             options: MOCK_OPTIONS_UPDATE,
             pool: 'AaveV3EthereumLido',
             cfg: liquidityMiningUpdateConfig,

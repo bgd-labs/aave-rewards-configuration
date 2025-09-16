@@ -3,8 +3,9 @@ import path from 'path';
 import {generateContractName, generateFolderName} from './common';
 import {liquidityMiningSetupTemplate} from './templates/liquiditymining.setup.template';
 import {liquidityMiningUpdateTemplate} from './templates/liquiditymining.update.template';
+import {umbrellaRewardsUpdateTemplate} from './templates/umbrellarewards.update.template';
 import {confirm} from '@inquirer/prompts';
-import {ConfigFile, Options, PoolConfigs, PoolIdentifier, Files} from './types';
+import {ConfigFile, Options, PoolConfigs, PoolIdentifier, Files, FEATURE} from './types';
 import prettier from 'prettier';
 
 const prettierSolCfg = await prettier.resolveConfig('foo.sol');
@@ -31,19 +32,21 @@ export async function generateFiles(options: Options, poolConfigs: PoolConfigs):
 
   async function createPayloadTest(options: Options, pool: PoolIdentifier) {
     const contractName = generateContractName(options, pool);
-    const isLMSetup = options.feature == 'SETUP_LM';
+    let template: string;
+    if (options.feature == FEATURE.SETUP_LM) {
+      template = liquidityMiningSetupTemplate(options, poolConfigs[pool]!, pool);
+    } else if (options.feature == FEATURE.UPDATE_LM) {
+      template = liquidityMiningUpdateTemplate(options, poolConfigs[pool]!, pool);
+    } else {
+      template = umbrellaRewardsUpdateTemplate(options, poolConfigs[pool]!, pool);
+    }
 
     return {
       pool,
-      payloadTest: await prettier.format(
-        isLMSetup
-          ? liquidityMiningSetupTemplate(options, poolConfigs[pool]!, pool)
-          : liquidityMiningUpdateTemplate(options, poolConfigs[pool]!, pool),
-        {
-          ...prettierSolCfg,
-          filepath: 'foo.sol',
-        }
-      ),
+      payloadTest: await prettier.format(template, {
+        ...prettierSolCfg,
+        filepath: 'foo.sol',
+      }),
       contractName: contractName,
     };
   }
