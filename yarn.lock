@@ -35,15 +35,15 @@
     js-tokens "^4.0.0"
     picocolors "^1.0.0"
 
-"@bgd-labs/aave-address-book@4.22.2":
-  version "4.22.2"
-  resolved "https://registry.npmjs.org/@bgd-labs/aave-address-book/-/aave-address-book-4.22.2.tgz"
-  integrity sha512-xoeyQ2ZrGuHbvm3e8K09Lc51CJKpKRDUyaGWk1yrfRRT4Yn8ipMMxRxhlHIwtN6K0GAgp6cyjG8+CNfdFLMaQg==
-
 "@bgd-labs/aave-address-book@^3.0.0":
   version "3.7.0"
   resolved "https://registry.npmjs.org/@bgd-labs/aave-address-book/-/aave-address-book-3.7.0.tgz"
   integrity sha512-uujysWEGz5cOV7s8e6jD0MOuRff7ujLFqtYtw8w1U5JnkAA5eCX/AWmeIx1xdBcd2hBzK52PlWbCeYXA4S8GeQ==
+
+"@bgd-labs/aave-address-book@^4.30.1":
+  version "4.30.1"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-address-book/-/aave-address-book-4.30.1.tgz#6e92aa64081bb917ed897421da1651b63138e394"
+  integrity sha512-rOtveLwI0YiD9FlcA5wG62o83GQ9cvnTqlR92xrpwH/ZnmYsx9N1EJ/7wFdllnTLSBHy08q2RekOH4GA1FoUxw==
 
 "@bgd-labs/aave-cli@0.16.4":
   version "0.16.4"
