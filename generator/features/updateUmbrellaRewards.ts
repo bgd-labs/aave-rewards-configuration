@@ -5,7 +5,6 @@ import {select} from '@inquirer/prompts';
 import {Hex, getContract} from 'viem';
 import {CodeArtifact, FEATURE, FeatureModule} from '../types';
 import {UmbrellaRewardsUpdate} from './types';
-import {addressPrompt} from '../prompts/addressPrompt';
 import {numberPrompt, numberPromptInDays, numberPromptNoTransform} from '../prompts/numberPrompt';
 import {
   umbrellaStkAssetsSelectPrompt,
@@ -31,16 +30,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     pool,
     required: true,
   });
-  let assetAddress: Hex;
-  if (asset == 'custom') {
-    asset = await addressPrompt({
-      message: 'Enter the address of the umbrella asset manually:',
-      required: true,
-    });
-    assetAddress = asset as Hex;
-  } else {
-    assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN;
-  }
+  const assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN;
 
   const rewardsControllerContract = getContract({
     abi: IUmbrellaRewardsController_ABI,
@@ -88,7 +78,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
       message: `Please input the maxEmissionsPerSecond you want to configure for the reward: ${reward.symbol} and asset: ${asset}`,
       choices: [
         {name: 'Keep maxEmissionsPerSecond the same as current', value: 'current'},
-        {name: 'Enter maxEmissionsPerSecond in token units / days', value: 'units'},
+        {name: 'Enter maxEmissionsPerSecond in token units / 180 days', value: 'units'},
         {name: 'Enter raw maxEmissionsPerSecond', value: 'raw'},
       ],
     });
@@ -96,15 +86,11 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     let maxEmissionsPerSecond: string;
     if (maxEmissionsPerSecondChoice == 'units') {
       const tokenUnits = await numberPrompt({
-        message: 'Enter the token units for maxEmissionsPerSecond',
-        required: true,
-      });
-      const days = await numberPromptInDays({
-        message: 'Enter the days for maxEmissionsPerSecond:',
+        message: 'Enter the token units for maxEmissionsPerSecond per 180 days',
         required: true,
       });
       const tokenDecimals = await getTokenDecimals(reward.asset, chainId);
-      maxEmissionsPerSecond = `uint256(${tokenUnits} * 1e${tokenDecimals}) / ${days} days`;
+      maxEmissionsPerSecond = `uint256(${tokenUnits} * 1e${tokenDecimals}) / 180 days`;
     } else if (maxEmissionsPerSecondChoice == 'raw') {
       maxEmissionsPerSecond = await numberPromptNoTransform(
         {message: 'Enter the maxEmissionsPerSecond raw value', required: true},
@@ -142,20 +128,8 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     } else {
       distributionEnd = 'EngineFlags.KEEP_CURRENT';
     }
-
-    let rewardPayer = await select({
-      message: 'Enter the address of the rewards payer you want to configure',
-      choices: [
-        {name: 'Aave Collector (Default)', value: getDefaultCollector(pool)},
-        {name: 'Custom Address (Enter Manually)', value: 'custom'},
-      ],
-    });
-    if (rewardPayer == 'custom') {
-      rewardPayer = await addressPrompt({
-        message: 'Enter the address of the new rewards payer you want to configure:',
-        required: true,
-      });
-    }
+    // default rewardPayer to the collector
+    const rewardPayer = getDefaultCollector(pool);
 
     input.push({
       asset,

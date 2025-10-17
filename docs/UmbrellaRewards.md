@@ -61,16 +61,18 @@ Fetching information for updating existing umbrella rewards on AaveV3BaseSepolia
 >◉ USDC
  ◯ USDT
 
+----------------------------------------------------------
+Current on-chain configuration for the reward: USDC and asset: STK_WA_USDC_V1:
+maxEmissionsPerSecond: 160000 (~414720.00 token units per month)
+distributionEnd: 1753788774 (Tue Jul 29 2025)
+----------------------------------------------------------
+
 ? Please input the maxEmissionsPerSecond you want to configure for the reward: USDC and asset: STK_WA_USDC_V1 (Use arrow keys)
 ❯ Keep maxEmissionsPerSecond the same as current
-  Enter maxEmissionsPerSecond in token units / days
+  Enter maxEmissionsPerSecond in token units / 180 days
   Enter raw maxEmissionsPerSecond
 
 ? Enter the distributionEnd in days from current timestamp: 60 days
-
-? Enter the address of the rewards payer you want to configure (Use arrow keys)
-❯ Aave Collector (Default)
-  Custom Address (Enter Manually)
 
 Scripts generated...
 ```

@@ -37,7 +37,7 @@ export interface Options {
   force?: boolean;
   feature: FEATURE;
   pool: PoolIdentifier;
-  title: string;
+  title?: string;
   shortName: string;
   configFile?: string;
   date: string;

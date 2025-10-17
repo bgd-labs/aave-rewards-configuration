@@ -53,7 +53,6 @@ export async function umbrellaStkAssetsSelectPrompt({pool, message}: GenericPool
   return await select({
     message,
     choices: [
-      {name: 'Custom Address (Enter Manually)', value: 'custom'},
       ...getUmbrellaStkAssets(pool).map((asset) => ({name: asset, value: asset})),
     ],
   });

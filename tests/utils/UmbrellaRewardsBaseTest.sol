@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {Test, console} from 'forge-std/Test.sol';
+import {Vm, Test, console} from 'forge-std/Test.sol';
+import {stdMath} from 'forge-std/StdMath.sol';
 import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 import {IRewardsController} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsController.sol';
 import {IRewardsStructs} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsStructs.sol';
@@ -33,7 +34,7 @@ abstract contract UmbrellaRewardsBaseTest is Test {
   function networkConfig() public virtual returns (NetworkConfig memory);
 
   function test_logCalldatas() public {
-    _getCalldata();
+    _getCalldataAndGenerateReport();
   }
 
   function test_sanity() public {
@@ -41,10 +42,12 @@ abstract contract UmbrellaRewardsBaseTest is Test {
 
     for (uint256 i = 0; i < config.length; i++) {
       RewardConfig memory cfg = config[i];
+
       IRewardsStructs.RewardDataExternal memory currentRewardData = IRewardsController(
         networkConfig().rewardsController
       ).getRewardData(cfg.asset, cfg.reward);
 
+      // validate maxEmissionPerSecond sanity
       if (
         cfg.maxEmissionPerSecond != EngineFlags.KEEP_CURRENT &&
         currentRewardData.maxEmissionPerSecond != 0
@@ -52,11 +55,12 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         vm.assertApproxEqRel(
           cfg.maxEmissionPerSecond,
           currentRewardData.maxEmissionPerSecond,
-          0.75e18, // 75%
-          'maxEmissionPerSecond change more than 75% than currently configured'
+          0.50e18, // 50%
+          'maxEmissionPerSecond change more than 50% than currently configured'
         );
       }
 
+      // validate distributionEnd sanity
       if (
         cfg.distributionEnd != EngineFlags.KEEP_CURRENT && currentRewardData.distributionEnd != 0
       ) {
@@ -66,10 +70,44 @@ abstract contract UmbrellaRewardsBaseTest is Test {
           'distributionEnd increased by more than 1 year than currently configured'
         );
       }
+
+      if (cfg.maxEmissionPerSecond == EngineFlags.KEEP_CURRENT) {
+        cfg.maxEmissionPerSecond = currentRewardData.maxEmissionPerSecond;
+      }
+      if (cfg.distributionEnd == EngineFlags.KEEP_CURRENT) {
+        cfg.distributionEnd = currentRewardData.distributionEnd;
+      }
+
+      uint256 distributionTime = cfg.distributionEnd > block.timestamp ? cfg.distributionEnd - block.timestamp : 0;
+      uint256 rewardAmountRequired = distributionTime * cfg.maxEmissionPerSecond;
+
+      // validate rewardPayer balance
+      vm.assertGe(
+        IERC20(cfg.reward).balanceOf(cfg.rewardPayer),
+        rewardAmountRequired,
+        'reward balance of the rewardPayer is less that the configured emissions'
+      );
+
+      // validate rewardPayer allowance
+      uint256 rewardAllowance = IERC20(cfg.reward).allowance(cfg.rewardPayer, networkConfig().rewardsController);
+      vm.assertGt(rewardAllowance, 0, 'rewardPayer allowance is 0');
+
+      if (rewardAllowance < (rewardAmountRequired * 120) / 100) { // 20% buffer
+        console.log(
+          'Allowance could be running low for reward: %s and asset: %s, please double check the allowance manually.',
+          IERC20(cfg.reward).symbol(),
+          IERC20(cfg.asset).symbol()
+        );
+        console.log(
+          'Current allowance: ~%s units. Minimum needed allowance: ~%s units',
+          rewardAllowance / (10 ** IERC20(cfg.reward).decimals()),
+          rewardAmountRequired / (10 ** IERC20(cfg.reward).decimals())
+        );
+      }
     }
   }
 
-  function _getCalldata() internal returns (address[] memory targets, bytes[] memory calldatas) {
+  function _getCalldataAndGenerateReport() internal returns (address[] memory targets, bytes[] memory calldatas) {
     RewardConfig[] memory config = configureUpdates();
     NetworkConfig memory network = networkConfig();
 
@@ -143,35 +181,44 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       );
 
       console.log(
-        'Changelog for reward',
+        'Changelog for reward: %s and asset: %s',
         IERC20(cfg.reward).symbol(),
-        ' asset',
         IERC20(cfg.asset).symbol()
       );
       if (maxEmissionsSame) {
-        console.log('maxEmissionsPerSecond: UNCHANGED');
+        console.log('maxEmissionsPerSecond:', currentRewardData.maxEmissionPerSecond, '(UNCHANGED)');
       } else {
+        uint256 percentChange = stdMath.percentDelta(currentRewardData.maxEmissionPerSecond, cfg.maxEmissionPerSecond) / 1e16;
         console.log(
-          'maxEmissionsPerSecond: Changed from',
+          'maxEmissionsPerSecond: Changed from %s to %s (Change delta: ~%s%)',
           currentRewardData.maxEmissionPerSecond,
-          ' to',
-          cfg.maxEmissionPerSecond
+          cfg.maxEmissionPerSecond,
+          percentChange
         );
       }
       if (distributionEndSame) {
-        console.log('distributionEnd: UNCHANGED');
+        console.log('distributionEnd:' , _getUnixTsToReadable(currentRewardData.distributionEnd), '(UNCHANGED)');
       } else {
         console.log(
-          'distributionEnd: Changed from',
-          currentRewardData.distributionEnd,
-          ' to',
-          cfg.distributionEnd
+          string(abi.encodePacked(
+            'distributionEnd: Changed from ',
+            vm.toString(currentRewardData.distributionEnd),
+            ' (',
+            _getUnixTsToReadable(currentRewardData.distributionEnd),
+            ') to ',
+            vm.toString(cfg.distributionEnd),
+            ' (',
+            _getUnixTsToReadable(cfg.distributionEnd),
+            ')'
+          ))
         );
       }
 
       console.log('Calldata: ');
       console.logBytes(calldatas[i]);
       console.log('');
+
+      generateSeatbeltReport(targets[i], calldatas[i]);
     }
   }
 
@@ -188,5 +235,40 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       signature: '',
       callData: txCalldata
     });
+  }
+
+  function _getUnixTsToReadable(uint256 timestamp) internal returns (string memory) {
+    string[] memory getDateCommand = new string[](3);
+    getDateCommand[0] = 'python3';
+    getDateCommand[1] = '-c';
+    getDateCommand[2] = string(abi.encodePacked(
+      'import datetime; print(datetime.datetime.fromtimestamp(',
+      vm.toString(timestamp),
+      ').isoformat())'
+    ));
+    return string(vm.ffi(getDateCommand));
+  }
+
+  function generateSeatbeltReport(
+    address payloadsController,
+    bytes memory payloadCalldata
+  ) internal {
+    string[] memory inputs = new string[](11);
+    inputs[0] = 'npx';
+    inputs[1] = '@bgd-labs/cli@^0.0.56';
+    inputs[2] = 'seatbelt-report';
+    inputs[3] = '--chainId';
+    inputs[4] = vm.toString(block.chainid);
+    inputs[5] = '--payloadsController';
+    inputs[6] = vm.toString(payloadsController);
+    inputs[7] = '--payloadCalldata';
+    inputs[8] = vm.toString(payloadCalldata);
+    inputs[9] = '--output';
+    inputs[10] = string.concat('./reports/seatbelt/', vm.toString(address(this)));
+
+    Vm.FfiResult memory f = vm.tryFfi(inputs);
+    if (f.exitCode != 0) {
+      console.logString(string(f.stderr));
+    }
   }
 }

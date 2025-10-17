@@ -30,7 +30,7 @@ export const config: ConfigFile = {
 };
 ",
   "payloadTest": {
-    "contractName": "AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602",
+    "contractName": "AaveV3BaseSepolia_UmbrellaRewardsUpdate_20250602",
     "payloadTest": "// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -40,9 +40,9 @@ import {UmbrellaBaseSepoliaAssets} from 'aave-address-book/UmbrellaBaseSepolia.s
 import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';
 
 /**
- * emit calldata: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia_Test/AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602.t.sol -vv
+ * emit calldata: forge test --mp tests/20250602_UmbrellaUpdateAaveV3BaseSepolia/AaveV3BaseSepolia_UmbrellaRewardsUpdate_20250602.t.sol -vv
  */
-contract AaveV3BaseSepolia_UmbrellaRewardsUpdateTest_20250602 is
+contract AaveV3BaseSepolia_UmbrellaRewardsUpdate_20250602 is
   UmbrellaRewardsBaseTest,
   UmbrellaBaseSepoliaConfig
 {

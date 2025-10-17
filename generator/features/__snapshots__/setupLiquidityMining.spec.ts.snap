@@ -34,7 +34,7 @@ export const config: ConfigFile = {
 };
 ",
   "payloadTest": {
-    "contractName": "AaveV3EthereumLido_LMSetupTest_20231023",
+    "contractName": "AaveV3EthereumLido_LMSetup_20231023",
     "payloadTest": "// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
@@ -42,7 +42,7 @@ import {AaveV3EthereumLido, AaveV3EthereumLidoAssets} from 'aave-address-book/Aa
 import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';
 import {LMSetupBaseTest} from '../utils/LMSetupBaseTest.sol';
 
-contract AaveV3EthereumLido_LMSetupTest_20231023 is LMSetupBaseTest {
+contract AaveV3EthereumLido_LMSetup_20231023 is LMSetupBaseTest {
   address public constant override REWARD_ASSET =
     AaveV3EthereumLidoAssets.AaveV3EthereumLidoAssets.wstETH_A_TOKEN_UNDERLYING;
   uint88 constant DURATION_DISTRIBUTION = 14 days;
