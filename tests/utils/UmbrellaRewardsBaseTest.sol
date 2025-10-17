@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-import {Test, console} from 'forge-std/Test.sol';
+import {Vm, Test, console} from 'forge-std/Test.sol';
 import {stdMath} from 'forge-std/StdMath.sol';
 import {IERC20} from 'forge-std/interfaces/IERC20.sol';
 import {IRewardsController} from 'aave-umbrella/src/contracts/rewards/interfaces/IRewardsController.sol';
@@ -34,7 +34,7 @@ abstract contract UmbrellaRewardsBaseTest is Test {
   function networkConfig() public virtual returns (NetworkConfig memory);
 
   function test_logCalldatas() public {
-    _getCalldata();
+    _getCalldataAndGenerateReport();
   }
 
   function test_sanity() public {
@@ -107,7 +107,7 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     }
   }
 
-  function _getCalldata() internal returns (address[] memory targets, bytes[] memory calldatas) {
+  function _getCalldataAndGenerateReport() internal returns (address[] memory targets, bytes[] memory calldatas) {
     RewardConfig[] memory config = configureUpdates();
     NetworkConfig memory network = networkConfig();
 
@@ -217,6 +217,8 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       console.log('Calldata: ');
       console.logBytes(calldatas[i]);
       console.log('');
+
+      generateSeatbeltReport(targets[i], calldatas[i]);
     }
   }
 
@@ -245,5 +247,28 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       ').isoformat())'
     ));
     return string(vm.ffi(getDateCommand));
+  }
+
+  function generateSeatbeltReport(
+    address payloadsController,
+    bytes memory payloadCalldata
+  ) internal {
+    string[] memory inputs = new string[](11);
+    inputs[0] = 'npx';
+    inputs[1] = '@bgd-labs/cli@^0.0.56';
+    inputs[2] = 'seatbelt-report';
+    inputs[3] = '--chainId';
+    inputs[4] = vm.toString(block.chainid);
+    inputs[5] = '--payloadsController';
+    inputs[6] = vm.toString(payloadsController);
+    inputs[7] = '--payloadCalldata';
+    inputs[8] = vm.toString(payloadCalldata);
+    inputs[9] = '--output';
+    inputs[10] = string.concat('./reports/seatbelt/', vm.toString(address(this)));
+
+    Vm.FfiResult memory f = vm.tryFfi(inputs);
+    if (f.exitCode != 0) {
+      console.logString(string(f.stderr));
+    }
   }
 }
