@@ -6,7 +6,7 @@ out = 'out'
 libs = ['lib']
 fs_permissions = [{access = "write", path = "./reports"}]
 solc = '0.8.27'
-evm_version = 'shanghai'
+evm_version = 'cancun'
 ffi = true
 
 [rpc_endpoints]
