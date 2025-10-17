@@ -55,8 +55,8 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         vm.assertApproxEqRel(
           cfg.maxEmissionPerSecond,
           currentRewardData.maxEmissionPerSecond,
-          0.75e18, // 75%
-          'maxEmissionPerSecond change more than 75% than currently configured'
+          0.50e18, // 50%
+          'maxEmissionPerSecond change more than 50% than currently configured'
         );
       }
 
