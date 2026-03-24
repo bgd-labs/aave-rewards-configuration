@@ -4,7 +4,7 @@ import {CHAIN_TO_CHAIN_ID, generateFolderName, getDate, getPoolChain} from './co
 import {input, select} from '@inquirer/prompts';
 import {ConfigFile, FEATURE, Options, POOLS, PoolCache, PoolConfigs, PoolIdentifier} from './types';
 import {generateFiles, writeFiles} from './generator';
-import {CHAIN_ID_CLIENT_MAP} from '@bgd-labs/js-utils';
+import {getClient} from './client';
 import {getBlockNumber} from 'viem/actions';
 import {setupLiquidityMining} from './features/setupLiquidityMining';
 import {updateLiquidityMining} from './features/updateLiquidityMining';
@@ -29,7 +29,7 @@ const FEATURE_MODULES = [setupLiquidityMining, updateLiquidityMining, updateUmbr
 
 async function generateDeterministicPoolCache(pool: PoolIdentifier): Promise<PoolCache> {
   const chain = getPoolChain(pool);
-  const client = CHAIN_ID_CLIENT_MAP[CHAIN_TO_CHAIN_ID[chain]];
+  const client = getClient(CHAIN_TO_CHAIN_ID[chain]);
   return {blockNumber: Number(await getBlockNumber(client))};
 }
 
@@ -53,7 +53,7 @@ async function fetchLMSetupOptions(pool: PoolIdentifier) {
       pool,
       cfg: poolConfigs[pool]!.configs[feature],
       cache: poolConfigs[pool]!.cache,
-    })
+    }),
   );
 }
 
@@ -77,7 +77,7 @@ async function fetchLMUpdateOptions(pool: PoolIdentifier) {
       pool,
       cfg: poolConfigs[pool]!.configs[feature],
       cache: poolConfigs[pool]!.cache,
-    })
+    }),
   );
 }
 
@@ -101,7 +101,7 @@ async function fetchUmbrellaRewardsOptions(pool: PoolIdentifier) {
       pool,
       cfg: poolConfigs[pool]!.configs[feature],
       cache: poolConfigs[pool]!.cache,
-    })
+    }),
   );
 }
 
@@ -120,7 +120,7 @@ if (options.configFile) {
         pool: options.pool,
         cfg: poolConfigs[options.pool]!.configs[FEATURE.SETUP_LM] as LiquidityMiningSetup,
         cache: poolConfigs[options.pool]!.cache,
-      })
+      }),
     );
   } else if (options.feature == FEATURE.UPDATE_LM) {
     poolConfigs[options.pool]!.artifacts.push(
@@ -129,7 +129,7 @@ if (options.configFile) {
         pool: options.pool,
         cfg: poolConfigs[options.pool]!.configs[FEATURE.UPDATE_LM] as LiquidityMiningUpdate,
         cache: poolConfigs[options.pool]!.cache,
-      })
+      }),
     );
   } else {
     poolConfigs[options.pool]!.artifacts.push(
@@ -140,7 +140,7 @@ if (options.configFile) {
           FEATURE.UPDATE_UMBRELLA_REWARDS
         ] as UmbrellaRewardsUpdate[],
         cache: poolConfigs[options.pool]!.cache,
-      })
+      }),
     );
   }
 } else {

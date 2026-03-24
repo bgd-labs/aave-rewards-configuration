@@ -16,7 +16,7 @@ export function transformNumberToPercent(value: string) {
 
 export async function percentPrompt<T extends boolean>(
   {message, required}: GenericPrompt<T>,
-  opts?
+  opts?,
 ): Promise<string> {
   const value = await advancedInput(
     {
@@ -29,7 +29,7 @@ export async function percentPrompt<T extends boolean>(
       pattern: /^[0-9]*\.?[0-9]*$/,
       patternError: 'Only decimal numbers are allowed (e.g. 1.1)',
     },
-    opts
+    opts,
   );
   return value;
 }

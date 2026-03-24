@@ -97,11 +97,13 @@ abstract contract LMBaseTest is Test {
 
   function _toUint88(uint256 value) internal pure returns (uint88) {
     require(value <= type(uint88).max, "SafeCast: value doesn't fit in 88 bits");
+    // forge-lint: disable-next-line(unsafe-typecast)
     return uint88(value);
   }
 
   function _toUint32(uint256 value) internal pure returns (uint32) {
     require(value <= type(uint32).max, "SafeCast: value doesn't fit in 32 bits");
+    // forge-lint: disable-next-line(unsafe-typecast)
     return uint32(value);
   }
 

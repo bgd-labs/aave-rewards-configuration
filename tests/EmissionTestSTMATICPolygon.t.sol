@@ -44,6 +44,7 @@ contract EmissionTestSTMATICPolygon is LMSetupBaseTest {
     );
 
     vm.prank(STMATIC_WHALE);
+    // forge-lint: disable-next-line
     IERC20(REWARD_ASSET).transfer(EMISSION_ADMIN, 50_000 ether);
 
     _testClaimRewardsForWhale(
@@ -60,6 +61,7 @@ contract EmissionTestSTMATICPolygon is LMSetupBaseTest {
     override
     returns (RewardsDataTypes.RewardsConfigInput[] memory)
   {
+    // forge-lint: disable-next-line(unsafe-typecast)
     uint32 distributionEnd = uint32(block.timestamp + DURATION_DISTRIBUTION);
 
     EmissionPerAsset[] memory emissionsPerAsset = _getEmissionsPerAsset();

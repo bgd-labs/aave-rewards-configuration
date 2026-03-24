@@ -27,6 +27,7 @@ contract EmissionTestMATICXPolygon is LMSetupBaseTest {
     vm.createSelectFork(vm.rpcUrl('polygon'), 60952423);
 
     vm.prank(MATICX_WHALE);
+    // forge-lint: disable-next-line
     IERC20(REWARD_ASSET).transfer(EMISSION_ADMIN, TOTAL_DISTRIBUTION);
 
     vm.prank(EMISSION_ADMIN);
@@ -59,6 +60,7 @@ contract EmissionTestMATICXPolygon is LMSetupBaseTest {
     override
     returns (RewardsDataTypes.RewardsConfigInput[] memory)
   {
+    // forge-lint: disable-next-line(unsafe-typecast)
     uint32 distributionEnd = uint32(block.timestamp + DURATION_DISTRIBUTION);
 
     EmissionPerAsset[] memory emissionsPerAsset = _getEmissionsPerAsset();

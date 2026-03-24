@@ -1,4 +1,4 @@
-import * as addressBook from '@bgd-labs/aave-address-book';
+import * as addressBook from '@aave-dao/aave-address-book';
 import {LiquidityMiningSetup, LiquidityMiningUpdate, UmbrellaRewardsUpdate} from './features/types';
 
 export const V3_POOLS = [

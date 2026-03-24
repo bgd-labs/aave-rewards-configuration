@@ -43,8 +43,7 @@ import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregato
 import {LMSetupBaseTest} from '../utils/LMSetupBaseTest.sol';
 
 contract AaveV3EthereumLido_LMSetup_20231023 is LMSetupBaseTest {
-  address public constant override REWARD_ASSET =
-    AaveV3EthereumLidoAssets.AaveV3EthereumLidoAssets.wstETH_A_TOKEN_UNDERLYING;
+  address public constant override REWARD_ASSET = AaveV3EthereumLidoAssets.wstETH_A_TOKEN;
   uint88 constant DURATION_DISTRIBUTION = 14 days;
   uint256 public constant override TOTAL_DISTRIBUTION = 100 * 10 ** 18;
   address constant EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;
@@ -138,7 +137,7 @@ exports[`feature: setupLiquidityMining > should return reasonable code 1`] = `
 {
   "code": {
     "constants": [
-      "address public constant override REWARD_ASSET = AaveV3EthereumLidoAssets.AaveV3EthereumLidoAssets.wstETH_A_TOKEN_UNDERLYING;",
+      "address public constant override REWARD_ASSET = AaveV3EthereumLidoAssets.wstETH_A_TOKEN;",
       "uint88 constant DURATION_DISTRIBUTION = 14 days;",
       "uint256 public constant override TOTAL_DISTRIBUTION = 100 * 10 ** 18;",
       "address constant EMISSION_ADMIN = 0xac140648435d03f784879cd789130F22Ef588Fcd;

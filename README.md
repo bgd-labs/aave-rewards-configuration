@@ -26,24 +26,24 @@ forge install
 
 <details>
   <summary><h4>Guide to setting up your Tenderly keys for seatbelt report:</h4></summary>
-  
+
   - To use the Seatbelt Report for umbrella rewards, you need these three access tokens from Tenderly:
-    
+
     - `TENDERLY_ACCESS_TOKEN`
     - `TENDERLY_PROJECT_SLUG`
     - `TENDERLY_ACCOUNT_SLUG`
-    
+
     Below is a guide on how you can get these from your Tenderly dashboard:
-    
+
     1. Make sure you have a [tenderly](https://dashboard.tenderly.co/) account created. Next, you need to select the project you wish to use, If you don’t have a project setup you can create a new one.
         ![sc-1](https://github.com/user-attachments/assets/4f4c4ff0-64d7-45ef-b024-4031c5317858)
-        
-    
-    2.  Inside your project section, head over to settings and click on Generate Access Token. An access token will be generated. Please save this token in a safe place, as we will need it later. This token generated will be your `TENDERLY_ACCESS_TOKEN` 
+
+
+    2.  Inside your project section, head over to settings and click on Generate Access Token. An access token will be generated. Please save this token in a safe place, as we will need it later. This token generated will be your `TENDERLY_ACCESS_TOKEN`
         <img width="1512" height="788" alt="sc-2" src="https://github.com/user-attachments/assets/ba223066-27c9-4183-9416-6df7f2662778" />
-        
-    
-    3. You can save these tokens on your .env. `TENDERLY_PROJECT_SLUG` will be the Project Slug as show on the settings in the above screenshot and `TENDERLY_ACCOUNT_SLUG` will be your Account Slug. 
+
+
+    3. You can save these tokens on your .env. `TENDERLY_PROJECT_SLUG` will be the Project Slug as show on the settings in the above screenshot and `TENDERLY_ACCOUNT_SLUG` will be your Account Slug.
     In the above case for example, the `TENDERLY_PROJECT_SLUG` will be *ink-seatbelt* and `TENDERLY_ACCOUNT_SLUG` will be *sleepandcoffee*
 
 </details>
@@ -56,6 +56,6 @@ forge test
 
 ## License
 
-Copyright © 2025 BGD Labs
+Copyright © 2026 BGD Labs
 
 This repository is covered by [MIT](./LICENSE) license.

@@ -22,12 +22,15 @@ export async function generateFiles(options: Options, poolConfigs: PoolConfigs):
     `import {ConfigFile} from '../../generator/types';
     export const config: ConfigFile = ${JSON.stringify({
       rootOptions: options,
-      poolOptions: (Object.keys(poolConfigs) as PoolIdentifier[]).reduce((acc, pool) => {
-        acc[pool] = {configs: poolConfigs[pool]!.configs, cache: poolConfigs[pool]!.cache};
-        return acc;
-      }, {}),
+      poolOptions: (Object.keys(poolConfigs) as PoolIdentifier[]).reduce(
+        (acc, pool) => {
+          acc[pool] = {configs: poolConfigs[pool]!.configs, cache: poolConfigs[pool]!.cache};
+          return acc;
+        },
+        {} as ConfigFile['poolOptions'],
+      ),
     } as ConfigFile)}`,
-    {...prettierTsCfg, filepath: 'foo.ts'}
+    {...prettierTsCfg, filepath: 'foo.ts'},
   );
 
   async function createPayloadTest(options: Options, pool: PoolIdentifier) {
@@ -96,6 +99,6 @@ export async function writeFiles(options: Options, {jsonConfig, payloadTest}: Fi
   await askBeforeWrite(
     options,
     path.join(baseFolder, `${payloadTest.contractName}.t.sol`),
-    payloadTest.payloadTest
+    payloadTest.payloadTest,
   );
 }

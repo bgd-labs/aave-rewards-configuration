@@ -68,5 +68,5 @@ export function prefixWithImports(code: string) {
     imports += `import {UmbrellaRewardsBaseTest} from '../utils/UmbrellaRewardsBaseTest.sol';\n`;
   }
 
-  return imports + code;
+  return imports + '\n' + code;
 }
