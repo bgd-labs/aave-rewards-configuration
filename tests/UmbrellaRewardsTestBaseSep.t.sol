@@ -18,7 +18,7 @@ contract UmbrellaRewardsTestBaseSep is UmbrellaRewardsBaseTest, UmbrellaBaseSepo
       reward: AaveV3BaseSepoliaAssets.WETH_A_TOKEN,
       rewardPayer: 0x24f321Cd3742B7a191e5ED7cE1be8059DEe91424,
       maxEmissionPerSecond: EngineFlags.KEEP_CURRENT,
-      distributionEnd: block.timestamp + 120 days
+      distributionEnd: block.timestamp + 30 days
     });
 
     return newConfig;
