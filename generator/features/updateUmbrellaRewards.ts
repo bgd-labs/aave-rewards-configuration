@@ -1,9 +1,9 @@
-import * as addressBook from '@bgd-labs/aave-address-book';
-import {IUmbrellaRewardsController_ABI} from '@bgd-labs/aave-address-book/abis';
-import {CHAIN_ID_CLIENT_MAP} from '@bgd-labs/js-utils';
+import * as addressBook from '@aave-dao/aave-address-book';
+import {IUmbrellaRewardsController_ABI} from '@aave-dao/aave-address-book/abis';
+import {getClient} from '../client';
 import {select} from '@inquirer/prompts';
 import {Hex, getContract} from 'viem';
-import {CodeArtifact, FEATURE, FeatureModule} from '../types';
+import {CodeArtifact, FEATURE, FeatureModule, PoolIdentifier} from '../types';
 import {UmbrellaRewardsUpdate} from './types';
 import {numberPrompt, numberPromptInDays, numberPromptNoTransform} from '../prompts/numberPrompt';
 import {
@@ -21,7 +21,7 @@ import {
   getMaxEmissionsPerSecondToReadable,
 } from '../common';
 
-export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<UmbrellaRewardsUpdate[]> {
+export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdentifier}): Promise<UmbrellaRewardsUpdate[]> {
   const chainId: number = CHAIN_TO_CHAIN_ID[getPoolChain(pool)];
   const umbrella = getUmbrellaFromPool(pool);
 
@@ -30,11 +30,12 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}): Promise<Umbrella
     pool,
     required: true,
   });
-  const assetAddress = addressBook[umbrella].UMBRELLA_STAKE_ASSETS[asset].STAKE_TOKEN;
+  const stakeAssets = addressBook[umbrella].UMBRELLA_STAKE_ASSETS;
+  const assetAddress = stakeAssets[asset as keyof typeof stakeAssets].STAKE_TOKEN;
 
   const rewardsControllerContract = getContract({
     abi: IUmbrellaRewardsController_ABI,
-    client: CHAIN_ID_CLIENT_MAP[chainId],
+    client: getClient(chainId),
     address: addressBook[umbrella].UMBRELLA_REWARDS_CONTROLLER,
   });
   const availableRewardAddresses = await rewardsControllerContract.read.getAllRewards([

@@ -41,7 +41,6 @@ pragma solidity ^0.8.0;
 import {AaveV3EthereumLido, AaveV3EthereumLidoAssets} from 'aave-address-book/AaveV3EthereumLido.sol';
 import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../../src/interfaces/IEmissionManager.sol';
 import {LMSetupBaseTest} from '../utils/LMSetupBaseTest.sol';
-
 contract AaveV3EthereumLido_LMSetup_20231023 is LMSetupBaseTest {
   address public constant override REWARD_ASSET =
     AaveV3EthereumLidoAssets.AaveV3EthereumLidoAssets.wstETH_A_TOKEN_UNDERLYING;

@@ -1,4 +1,4 @@
-import * as addressBook from '@bgd-labs/aave-address-book';
+import * as addressBook from '@aave-dao/aave-address-book';
 import {FEATURE, Options, PoolIdentifier, UmbrellaIdentifier} from './types';
 import {
   arbitrum,
@@ -13,10 +13,12 @@ import {
   gnosis,
   scroll,
   zkSync,
+  fantom,
+  harmonyOne,
 } from 'viem/chains';
 import {Hex, getAddress, getContract} from 'viem';
-import {CHAIN_ID_CLIENT_MAP} from '@bgd-labs/js-utils';
-import {IERC20Detailed_ABI} from '@bgd-labs/aave-address-book/abis';
+import {getClient} from './client';
+import {IERC20Detailed_ABI} from '../generator/abi/IERC20Detailed.ts';
 import BigNumber from 'bignumber.js';
 
 export const AVAILABLE_CHAINS = [
@@ -67,9 +69,8 @@ export function getAddressOfSupplyBorrowAsset(pool: PoolIdentifier, asset: strin
   const underlyingAsset = isBorrowAsset
     ? asset.replace('_variableDebtToken', '')
     : asset.replace('_aToken', '');
-  return isBorrowAsset
-    ? addressBook[pool].ASSETS[underlyingAsset].V_TOKEN
-    : addressBook[pool].ASSETS[underlyingAsset].A_TOKEN;
+  const assets = addressBook[pool].ASSETS as Record<string, {V_TOKEN: Hex; A_TOKEN: Hex}>;
+  return isBorrowAsset ? assets[underlyingAsset].V_TOKEN : assets[underlyingAsset].A_TOKEN;
 }
 
 export async function calculateExpectedWhaleRewards(
@@ -80,7 +81,7 @@ export async function calculateExpectedWhaleRewards(
 ) {
   const assetContract = getContract({
     abi: IERC20Detailed_ABI,
-    client: CHAIN_ID_CLIENT_MAP[chainId],
+    client: getClient(chainId),
     address: asset,
   });
   const assetTotalSupply = await assetContract.read.totalSupply();
@@ -95,7 +96,7 @@ export async function calculateExpectedWhaleRewards(
 export async function getTokenDecimals(asset: Hex, chainId: number): Promise<number> {
   const assetContract = getContract({
     abi: IERC20Detailed_ABI,
-    client: CHAIN_ID_CLIENT_MAP[chainId],
+    client: getClient(chainId),
     address: asset,
   });
   return assetContract.read.decimals();
@@ -105,7 +106,7 @@ export async function getTokenSymbols(assets: Hex[], chainId: number): Promise<s
   const contracts = assets.map((asset) =>
     getContract({
       abi: IERC20Detailed_ABI,
-      client: CHAIN_ID_CLIENT_MAP[chainId],
+      client: getClient(chainId),
       address: asset,
     })
   );
@@ -132,7 +133,7 @@ export function getUmbrellaFromPoolChain(pool: PoolIdentifier) {
 }
 
 export function getExplorerLink(chainId: number, address: Hex) {
-  const client = CHAIN_ID_CLIENT_MAP[chainId];
+  const client = getClient(chainId);
   let url = client.chain?.blockExplorers?.default.url;
   if (url && url.endsWith('/')) {
     url = url.slice(0, -1); // sanitize explorer url
@@ -141,7 +142,7 @@ export function getExplorerLink(chainId: number, address: Hex) {
 }
 
 export function getExplorerTokenHoldersLink(chainId: number, address: Hex) {
-  const client = CHAIN_ID_CLIENT_MAP[chainId];
+  const client = getClient(chainId);
   let url = client.chain?.blockExplorers?.default.url;
   if (url && url.endsWith('/')) {
     url = url.slice(0, -1); // sanitize explorer url
@@ -195,7 +196,7 @@ export function generateContractName(options: Options, pool?: PoolIdentifier) {
   return name;
 }
 
-export function getChainAlias(chain) {
+export function getChainAlias(chain: string) {
   return chain === 'Ethereum' ? 'mainnet' : chain.toLowerCase();
 }
 
@@ -221,6 +222,8 @@ export const CHAIN_TO_CHAIN_ID = {
   Gnosis: gnosis.id,
   Scroll: scroll.id,
   ZkSync: zkSync.id,
+  Fantom: fantom.id,
+  Harmony: harmonyOne.id,
 };
 
 export async function getMaxEmissionsPerSecondToReadable(

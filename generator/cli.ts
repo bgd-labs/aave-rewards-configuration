@@ -4,7 +4,7 @@ import {CHAIN_TO_CHAIN_ID, generateFolderName, getDate, getPoolChain} from './co
 import {input, select} from '@inquirer/prompts';
 import {ConfigFile, FEATURE, Options, POOLS, PoolCache, PoolConfigs, PoolIdentifier} from './types';
 import {generateFiles, writeFiles} from './generator';
-import {CHAIN_ID_CLIENT_MAP} from '@bgd-labs/js-utils';
+import {getClient} from './client';
 import {getBlockNumber} from 'viem/actions';
 import {setupLiquidityMining} from './features/setupLiquidityMining';
 import {updateLiquidityMining} from './features/updateLiquidityMining';
@@ -29,7 +29,7 @@ const FEATURE_MODULES = [setupLiquidityMining, updateLiquidityMining, updateUmbr
 
 async function generateDeterministicPoolCache(pool: PoolIdentifier): Promise<PoolCache> {
   const chain = getPoolChain(pool);
-  const client = CHAIN_ID_CLIENT_MAP[CHAIN_TO_CHAIN_ID[chain]];
+  const client = getClient(CHAIN_TO_CHAIN_ID[chain]);
   return {blockNumber: Number(await getBlockNumber(client))};
 }
 

@@ -1,0 +1,11 @@
+{
+  "lib/aave-address-book": {
+    "rev": "7cd5943125e779c8f5b1e22fda605059108f06a4"
+  },
+  "lib/aave-umbrella": {
+    "rev": "759147d15456c84e0c3a974e672ca41cdd64d159"
+  },
+  "lib/forge-std": {
+    "rev": "f46d8301cf732f4f83846565aa475628265e51e0"
+  }
+}

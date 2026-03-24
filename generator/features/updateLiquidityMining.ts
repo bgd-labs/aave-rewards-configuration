@@ -1,6 +1,6 @@
-import * as addressBook from '@bgd-labs/aave-address-book';
+import * as addressBook from '@aave-dao/aave-address-book';
 import {Hex, getContract, Address} from 'viem';
-import {CodeArtifact, FEATURE, FeatureModule} from '../types';
+import {CodeArtifact, FEATURE, FeatureModule, PoolIdentifier} from '../types';
 import {LiquidityMiningUpdate} from './types';
 import {
   supplyUnderlyingAssetsSelectPrompt,
@@ -10,7 +10,7 @@ import {
 } from '../prompts/assetsSelectPrompt';
 import {addressPrompt} from '../prompts/addressPrompt';
 import {percentPrompt} from '../prompts/percentPrompt';
-import {CHAIN_ID_CLIENT_MAP} from '@bgd-labs/js-utils';
+import {getClient} from '../client';
 import {numberPromptInDays} from '../prompts/numberPrompt';
 import {
   getTokenDecimals,
@@ -21,7 +21,7 @@ import {
   calculateExpectedWhaleRewards,
 } from '../common';
 
-export async function fetchLiquidityMiningUpdateParams({pool}): Promise<LiquidityMiningUpdate> {
+export async function fetchLiquidityMiningUpdateParams({pool}: {pool: PoolIdentifier}): Promise<LiquidityMiningUpdate> {
   let rewardToken = await supplyUnderlyingAssetsSelectPrompt({
     message: 'Select the reward asset for the LM:',
     pool,
@@ -35,9 +35,10 @@ export async function fetchLiquidityMiningUpdateParams({pool}): Promise<Liquidit
     });
     rewardTokenAddress = rewardToken as Hex;
   } else {
+    const assets = addressBook[pool].ASSETS as Record<string, {A_TOKEN: Hex; UNDERLYING: Hex}>;
     rewardTokenAddress = rewardToken.includes('_aToken')
-      ? addressBook[pool].ASSETS[rewardToken.replace('_aToken', '')].A_TOKEN
-      : addressBook[pool].ASSETS[rewardToken].UNDERLYING;
+      ? assets[rewardToken.replace('_aToken', '')].A_TOKEN
+      : assets[rewardToken].UNDERLYING;
     rewardToken = translateAssetToAssetLibUnderlying(rewardToken, pool);
   }
   const asset = await supplyBorrowAssetSelectPrompt({
@@ -81,7 +82,7 @@ export async function fetchLiquidityMiningUpdateParams({pool}): Promise<Liquidit
         type: 'function',
       },
     ],
-    client: CHAIN_ID_CLIENT_MAP[chainId],
+    client: getClient(chainId),
     address: addressBook[pool].EMISSION_MANAGER,
   });
   const emissionsAdmin = (await emissionManagerContract.read.getEmissionAdmin([
