@@ -21,7 +21,11 @@ import {
   getMaxEmissionsPerSecondToReadable,
 } from '../common';
 
-export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdentifier}): Promise<UmbrellaRewardsUpdate[]> {
+export async function fetchUmbrellaRewardsUpdateParams({
+  pool,
+}: {
+  pool: PoolIdentifier;
+}): Promise<UmbrellaRewardsUpdate[]> {
   const chainId: number = CHAIN_TO_CHAIN_ID[getPoolChain(pool)];
   const umbrella = getUmbrellaFromPool(pool);
 
@@ -46,7 +50,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdenti
   const rewardsAddresses = await addressCheckboxPromptWithSymbol(
     availableRewardAddresses as Hex[],
     symbols,
-    'Select the rewards you wish to update for the asset'
+    'Select the rewards you wish to update for the asset',
   );
   const input: UmbrellaRewardsUpdate[] = [];
 
@@ -57,7 +61,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdenti
     ]);
     console.log('----------------------------------------------------------');
     console.log(
-      `Current on-chain configuration for the reward: ${reward.symbol} and asset: ${asset}:`
+      `Current on-chain configuration for the reward: ${reward.symbol} and asset: ${asset}:`,
     );
     console.log(
       `maxEmissionsPerSecond: ${
@@ -65,13 +69,13 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdenti
       } (${await getMaxEmissionsPerSecondToReadable(
         chainId,
         reward.asset,
-        Number(currentConfig.maxEmissionPerSecond)
-      )})`
+        Number(currentConfig.maxEmissionPerSecond),
+      )})`,
     );
     console.log(
       `distributionEnd: ${currentConfig.distributionEnd} (${new Date(
-        Number(currentConfig.distributionEnd) * 1000
-      ).toDateString()})`
+        Number(currentConfig.distributionEnd) * 1000,
+      ).toDateString()})`,
     );
     console.log('----------------------------------------------------------');
 
@@ -97,7 +101,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdenti
         {message: 'Enter the maxEmissionsPerSecond raw value', required: true},
         {
           skipTransform: true,
-        }
+        },
       );
     } else {
       maxEmissionsPerSecond = 'EngineFlags.KEEP_CURRENT';
@@ -124,7 +128,7 @@ export async function fetchUmbrellaRewardsUpdateParams({pool}: {pool: PoolIdenti
         {message: 'Enter the distributionEnd in unix timestamp', required: true},
         {
           skipTransform: true,
-        }
+        },
       );
     } else {
       distributionEnd = 'EngineFlags.KEEP_CURRENT';
@@ -155,7 +159,7 @@ export const updateUmbrellaRewards: FeatureModule<UmbrellaRewardsUpdate[]> = {
   async build({pool, cfg}) {
     const rewardSymbols = await getTokenSymbols(
       cfg.map((s) => s.reward as Hex),
-      CHAIN_TO_CHAIN_ID[getPoolChain(pool)]
+      CHAIN_TO_CHAIN_ID[getPoolChain(pool)],
     );
     const response: CodeArtifact = {
       code: {
@@ -172,7 +176,7 @@ export const updateUmbrellaRewards: FeatureModule<UmbrellaRewardsUpdate[]> = {
                rewardPayer: ${cfg.rewardPayer},
                maxEmissionPerSecond: ${cfg.maxEmissionsPerSecond},
                distributionEnd: ${cfg.distributionEnd}
-             });`
+             });`,
             )
             .join('\n')}
 

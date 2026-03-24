@@ -21,7 +21,11 @@ import {
   calculateExpectedWhaleRewards,
 } from '../common';
 
-export async function fetchLiquidityMiningSetupParams({pool}: {pool: PoolIdentifier}): Promise<LiquidityMiningSetup> {
+export async function fetchLiquidityMiningSetupParams({
+  pool,
+}: {
+  pool: PoolIdentifier;
+}): Promise<LiquidityMiningSetup> {
   let rewardToken = await supplyUnderlyingAssetsSelectPrompt({
     message: 'Select the reward asset for the LM:',
     pool,
@@ -94,8 +98,8 @@ export async function fetchLiquidityMiningSetupParams({pool}: {pool: PoolIdentif
         whaleAddress,
         supplyBorrowAssetAddress,
         rewardAmount,
-        chainId
-      )
+        chainId,
+      ),
     );
   }
 
@@ -126,9 +130,7 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
     const response: CodeArtifact = {
       code: {
         constants: [
-          cfg.rewardToken.includes('0x')
-            ? `address public constant override REWARD_ASSET = ${cfg.rewardToken};`
-            : `address public constant override REWARD_ASSET = ${pool}Assets.${cfg.rewardToken}_UNDERLYING;`,
+          `address public constant override REWARD_ASSET = ${cfg.rewardToken};`,
           `uint88 constant DURATION_DISTRIBUTION = ${cfg.distributionEnd} days;`,
           `uint256 public constant override TOTAL_DISTRIBUTION = ${cfg.totalReward} * 10 ** ${cfg.rewardTokenDecimals};`,
           `address constant EMISSION_ADMIN = ${cfg.emissionsAdmin};\n`,
@@ -138,7 +140,7 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
           ...cfg.assets.map((asset, index) => {
             let whaleConstants = `address constant ${translateSupplyBorrowAssetToWhaleConstant(
               asset,
-              pool
+              pool,
             )} = ${cfg.whaleAddresses[index]};`;
             return whaleConstants;
           }),
@@ -165,7 +167,7 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
                   ${translateAssetToAssetLibUnderlying(assets, pool)},
                   DURATION_DISTRIBUTION,
                   ${cfg.whaleExpectedRewards[ix]} * 10 ** ${cfg.rewardTokenDecimals}
-                );`
+                );`,
               )
               .join('\n')}
           }
@@ -202,7 +204,7 @@ export const setupLiquidityMining: FeatureModule<LiquidityMiningSetup> = {
                 emissionsPerAsset[${ix}] = EmissionPerAsset({
                   asset: ${translateAssetToAssetLibUnderlying(assets, pool)},
                   emission: ${cfg.rewardAmounts[ix]} * 10 ** ${cfg.rewardTokenDecimals}
-                });`
+                });`,
               )
               .join('\n')}
 

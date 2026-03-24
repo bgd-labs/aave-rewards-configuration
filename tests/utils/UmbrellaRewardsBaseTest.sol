@@ -78,7 +78,9 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         cfg.distributionEnd = currentRewardData.distributionEnd;
       }
 
-      uint256 distributionTime = cfg.distributionEnd > block.timestamp ? cfg.distributionEnd - block.timestamp : 0;
+      uint256 distributionTime = cfg.distributionEnd > block.timestamp
+        ? cfg.distributionEnd - block.timestamp
+        : 0;
       uint256 rewardAmountRequired = distributionTime * cfg.maxEmissionPerSecond;
 
       // validate rewardPayer balance
@@ -89,10 +91,14 @@ abstract contract UmbrellaRewardsBaseTest is Test {
       );
 
       // validate rewardPayer allowance
-      uint256 rewardAllowance = IERC20(cfg.reward).allowance(cfg.rewardPayer, networkConfig().rewardsController);
+      uint256 rewardAllowance = IERC20(cfg.reward).allowance(
+        cfg.rewardPayer,
+        networkConfig().rewardsController
+      );
       vm.assertGt(rewardAllowance, 0, 'rewardPayer allowance is 0');
 
-      if (rewardAllowance < (rewardAmountRequired * 120) / 100) { // 20% buffer
+      if (rewardAllowance < (rewardAmountRequired * 120) / 100) {
+        // 20% buffer
         console.log(
           'Allowance could be running low for reward: %s and asset: %s, please double check the allowance manually.',
           IERC20(cfg.reward).symbol(),
@@ -107,7 +113,10 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     }
   }
 
-  function _getCalldataAndGenerateReport() internal returns (address[] memory targets, bytes[] memory calldatas) {
+  function _getCalldataAndGenerateReport()
+    internal
+    returns (address[] memory targets, bytes[] memory calldatas)
+  {
     RewardConfig[] memory config = configureUpdates();
     NetworkConfig memory network = networkConfig();
 
@@ -186,9 +195,16 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         IERC20(cfg.asset).symbol()
       );
       if (maxEmissionsSame) {
-        console.log('maxEmissionsPerSecond:', currentRewardData.maxEmissionPerSecond, '(UNCHANGED)');
+        console.log(
+          'maxEmissionsPerSecond:',
+          currentRewardData.maxEmissionPerSecond,
+          '(UNCHANGED)'
+        );
       } else {
-        uint256 percentChange = stdMath.percentDelta(currentRewardData.maxEmissionPerSecond, cfg.maxEmissionPerSecond) / 1e16;
+        uint256 percentChange = stdMath.percentDelta(
+          currentRewardData.maxEmissionPerSecond,
+          cfg.maxEmissionPerSecond
+        ) / 1e16;
         console.log(
           'maxEmissionsPerSecond: Changed from %s to %s (Change delta: ~%s%)',
           currentRewardData.maxEmissionPerSecond,
@@ -197,20 +213,26 @@ abstract contract UmbrellaRewardsBaseTest is Test {
         );
       }
       if (distributionEndSame) {
-        console.log('distributionEnd:' , _getUnixTsToReadable(currentRewardData.distributionEnd), '(UNCHANGED)');
+        console.log(
+          'distributionEnd:',
+          _getUnixTsToReadable(currentRewardData.distributionEnd),
+          '(UNCHANGED)'
+        );
       } else {
         console.log(
-          string(abi.encodePacked(
-            'distributionEnd: Changed from ',
-            vm.toString(currentRewardData.distributionEnd),
-            ' (',
-            _getUnixTsToReadable(currentRewardData.distributionEnd),
-            ') to ',
-            vm.toString(cfg.distributionEnd),
-            ' (',
-            _getUnixTsToReadable(cfg.distributionEnd),
-            ')'
-          ))
+          string(
+            abi.encodePacked(
+              'distributionEnd: Changed from ',
+              vm.toString(currentRewardData.distributionEnd),
+              ' (',
+              _getUnixTsToReadable(currentRewardData.distributionEnd),
+              ') to ',
+              vm.toString(cfg.distributionEnd),
+              ' (',
+              _getUnixTsToReadable(cfg.distributionEnd),
+              ')'
+            )
+          )
         );
       }
 
@@ -241,11 +263,13 @@ abstract contract UmbrellaRewardsBaseTest is Test {
     string[] memory getDateCommand = new string[](3);
     getDateCommand[0] = 'python3';
     getDateCommand[1] = '-c';
-    getDateCommand[2] = string(abi.encodePacked(
-      'import datetime; print(datetime.datetime.fromtimestamp(',
-      vm.toString(timestamp),
-      ').isoformat())'
-    ));
+    getDateCommand[2] = string(
+      abi.encodePacked(
+        'import datetime; print(datetime.datetime.fromtimestamp(',
+        vm.toString(timestamp),
+        ').isoformat())'
+      )
+    );
     return string(vm.ffi(getDateCommand));
   }
 

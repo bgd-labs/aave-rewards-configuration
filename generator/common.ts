@@ -77,7 +77,7 @@ export async function calculateExpectedWhaleRewards(
   whaleAddress: Hex,
   asset: Hex,
   rewardAmount: string,
-  chainId: number
+  chainId: number,
 ) {
   const assetContract = getContract({
     abi: IERC20Detailed_ABI,
@@ -88,7 +88,7 @@ export async function calculateExpectedWhaleRewards(
   const whaleBalance = await assetContract.read.balanceOf([whaleAddress]);
 
   const whaleRewardsShare = new BigNumber(whaleBalance.toString()).div(
-    new BigNumber(assetTotalSupply.toString())
+    new BigNumber(assetTotalSupply.toString()),
   );
   return whaleRewardsShare.multipliedBy(new BigNumber(rewardAmount)).decimalPlaces(2).toString();
 }
@@ -108,7 +108,7 @@ export async function getTokenSymbols(assets: Hex[], chainId: number): Promise<s
       abi: IERC20Detailed_ABI,
       client: getClient(chainId),
       address: asset,
-    })
+    }),
   );
   const symbols = await Promise.all(contracts.map((contract) => contract.read.symbol()));
   return symbols;
@@ -229,7 +229,7 @@ export const CHAIN_TO_CHAIN_ID = {
 export async function getMaxEmissionsPerSecondToReadable(
   chainId: number,
   reward: Hex,
-  emission: number
+  emission: number,
 ): Promise<string> {
   const rewardDecimals = await getTokenDecimals(reward, chainId);
   const emissionsPerMonth = (emission * (30 * 24 * 3600)) / 10 ** rewardDecimals;

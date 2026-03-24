@@ -29,7 +29,7 @@ export async function assetsSelectPrompt({pool, message}: GenericPoolPrompt) {
 export async function addressCheckboxPromptWithSymbol(
   assets: Hex[],
   symbols: string[],
-  message: string
+  message: string,
 ) {
   return await checkbox({
     message,
@@ -52,9 +52,7 @@ export async function supplyUnderlyingAssetsSelectPrompt({pool, message}: Generi
 export async function umbrellaStkAssetsSelectPrompt({pool, message}: GenericPoolPrompt) {
   return await select({
     message,
-    choices: [
-      ...getUmbrellaStkAssets(pool).map((asset) => ({name: asset, value: asset})),
-    ],
+    choices: [...getUmbrellaStkAssets(pool).map((asset) => ({name: asset, value: asset}))],
   });
 }
 

@@ -69,7 +69,7 @@ abstract contract LMUpdateBaseTest is LMBaseTest {
     assertGe(balance, this.NEW_TOTAL_DISTRIBUTION());
   }
 
-  function test_validateLMParams() public {
+  function test_validateLMParams() public view {
     NewDistributionEndPerAsset memory distributionEnds = _getNewDistributionEnd();
     NewEmissionPerAsset memory emissionsPerAsset = _getNewEmissionPerSecond();
 
@@ -84,7 +84,7 @@ abstract contract LMUpdateBaseTest is LMBaseTest {
     }
   }
 
-  function _validateIndexDoesNotOverflow(address asset, uint256 emissionPerSecond) internal {
+  function _validateIndexDoesNotOverflow(address asset, uint256 emissionPerSecond) internal view {
     uint256 maxTimeDelta = block.timestamp;
     uint256 totalSupplyLowerBound = 100 * (10 ** IERC20(asset).decimals()); // 100 asset unit
     uint256 index = _calcualteAssetIndex(
@@ -97,7 +97,7 @@ abstract contract LMUpdateBaseTest is LMBaseTest {
     assertLt(index, type(uint104).max / 1_000);
   }
 
-  function _validateIndexNotZero(address asset, uint256 emissionPerSecond) internal {
+  function _validateIndexNotZero(address asset, uint256 emissionPerSecond) internal view {
     uint256 timeDeltaLowerBound = 1;
     uint256 maxTotalSupply = IScaledBalanceToken(asset).scaledTotalSupply() * 1_000; // 1000 times the current totalSupply
     uint256 index = _calcualteAssetIndex(

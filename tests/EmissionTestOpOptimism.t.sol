@@ -44,6 +44,7 @@ contract EmissionTestOpOptimism is LMSetupBaseTest {
     override
     returns (RewardsDataTypes.RewardsConfigInput[] memory)
   {
+    // forge-lint: disable-next-line(unsafe-typecast)
     uint32 distributionEnd = uint32(block.timestamp + DURATION_DISTRIBUTION);
 
     EmissionPerAsset[] memory emissionsPerAsset = _getEmissionsPerAsset();

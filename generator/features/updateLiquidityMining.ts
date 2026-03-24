@@ -21,7 +21,11 @@ import {
   calculateExpectedWhaleRewards,
 } from '../common';
 
-export async function fetchLiquidityMiningUpdateParams({pool}: {pool: PoolIdentifier}): Promise<LiquidityMiningUpdate> {
+export async function fetchLiquidityMiningUpdateParams({
+  pool,
+}: {
+  pool: PoolIdentifier;
+}): Promise<LiquidityMiningUpdate> {
   let rewardToken = await supplyUnderlyingAssetsSelectPrompt({
     message: 'Select the reward asset for the LM:',
     pool,
@@ -60,7 +64,7 @@ export async function fetchLiquidityMiningUpdateParams({pool}: {pool: PoolIdenti
   const whaleAddress = await addressPrompt({
     message: `Enter the whale address to test rewards for ${asset} from ${getExplorerTokenHoldersLink(
       chainId,
-      supplyBorrowAssetAddress
+      supplyBorrowAssetAddress,
     )} `,
     required: true,
   });
@@ -68,7 +72,7 @@ export async function fetchLiquidityMiningUpdateParams({pool}: {pool: PoolIdenti
     whaleAddress,
     supplyBorrowAssetAddress,
     rewardAmount,
-    chainId
+    chainId,
   );
   const rewardTokenDecimals = await getTokenDecimals(rewardTokenAddress, chainId);
 
@@ -120,7 +124,7 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
           `uint256 public constant NEW_DURATION_DISTRIBUTION_END = ${cfg.distributionEnd} days;`,
           `address public constant ${translateSupplyBorrowAssetToWhaleConstant(
             cfg.asset,
-            pool
+            pool,
           )} = ${cfg.whaleAddress};\n`,
           `address public constant override DEFAULT_INCENTIVES_CONTROLLER = ${pool}.DEFAULT_INCENTIVES_CONTROLLER;\n`,
         ],
@@ -170,7 +174,7 @@ export const updateLiquidityMining: FeatureModule<LiquidityMiningUpdate> = {
 
             newDistributionEndPerAsset.asset = ${translateAssetToAssetLibUnderlying(
               cfg.asset,
-              pool
+              pool,
             )};
             newDistributionEndPerAsset.reward = REWARD_ASSET;
             newDistributionEndPerAsset.newDistributionEnd = _toUint32(

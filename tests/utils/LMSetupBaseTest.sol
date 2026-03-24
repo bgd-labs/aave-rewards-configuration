@@ -7,7 +7,7 @@ import {ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../.
 import {LMBaseTest} from '../utils/LMBaseTest.sol';
 
 abstract contract LMSetupBaseTest is LMBaseTest {
-  function test_validateLMParams() public {
+  function test_validateLMParams() public view {
     RewardsDataTypes.RewardsConfigInput[] memory rewardConfigs = _getAssetConfigs();
 
     for (uint i = 0; i < rewardConfigs.length; i++) {
@@ -37,12 +37,13 @@ abstract contract LMSetupBaseTest is LMBaseTest {
 
   function test_rewardOracleSanity() public {
     int256 rewardPrice = this.REWARD_ORACLE().latestAnswer();
+    // forge-lint: disable-next-line(unsafe-typecast)
     assertGt(uint256(rewardPrice), 0);
   }
 
   function _validateIndexDoesNotOverflow(
     RewardsDataTypes.RewardsConfigInput memory rewardConfig
-  ) internal {
+  ) internal view {
     uint256 maxTimeDelta = block.timestamp;
     uint256 totalSupplyLowerBound = 100 * (10 ** IERC20(rewardConfig.asset).decimals()); // 100 asset unit
     uint256 index = _calcualteAssetIndex(
@@ -55,7 +56,9 @@ abstract contract LMSetupBaseTest is LMBaseTest {
     assertLt(index, type(uint104).max / 1_000);
   }
 
-  function _validateIndexNotZero(RewardsDataTypes.RewardsConfigInput memory rewardConfig) internal {
+  function _validateIndexNotZero(
+    RewardsDataTypes.RewardsConfigInput memory rewardConfig
+  ) internal view {
     uint256 timeDeltaLowerBound = 1;
     uint256 maxTotalSupply = IScaledBalanceToken(rewardConfig.asset).scaledTotalSupply() * 1_000; // 1000 times the current totalSupply
     uint256 index = _calcualteAssetIndex(

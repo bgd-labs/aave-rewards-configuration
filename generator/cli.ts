@@ -53,7 +53,7 @@ async function fetchLMSetupOptions(pool: PoolIdentifier) {
       pool,
       cfg: poolConfigs[pool]!.configs[feature],
       cache: poolConfigs[pool]!.cache,
-    })
+    }),
   );
 }
 
@@ -77,7 +77,7 @@ async function fetchLMUpdateOptions(pool: PoolIdentifier) {
       pool,
       cfg: poolConfigs[pool]!.configs[feature],
       cache: poolConfigs[pool]!.cache,
-    })
+    }),
   );
 }
 
@@ -101,7 +101,7 @@ async function fetchUmbrellaRewardsOptions(pool: PoolIdentifier) {
       pool,
       cfg: poolConfigs[pool]!.configs[feature],
       cache: poolConfigs[pool]!.cache,
-    })
+    }),
   );
 }
 
@@ -120,7 +120,7 @@ if (options.configFile) {
         pool: options.pool,
         cfg: poolConfigs[options.pool]!.configs[FEATURE.SETUP_LM] as LiquidityMiningSetup,
         cache: poolConfigs[options.pool]!.cache,
-      })
+      }),
     );
   } else if (options.feature == FEATURE.UPDATE_LM) {
     poolConfigs[options.pool]!.artifacts.push(
@@ -129,7 +129,7 @@ if (options.configFile) {
         pool: options.pool,
         cfg: poolConfigs[options.pool]!.configs[FEATURE.UPDATE_LM] as LiquidityMiningUpdate,
         cache: poolConfigs[options.pool]!.cache,
-      })
+      }),
     );
   } else {
     poolConfigs[options.pool]!.artifacts.push(
@@ -140,7 +140,7 @@ if (options.configFile) {
           FEATURE.UPDATE_UMBRELLA_REWARDS
         ] as UmbrellaRewardsUpdate[],
         cache: poolConfigs[options.pool]!.cache,
-      })
+      }),
     );
   }
 } else {
