@@ -1,0 +1,149 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+import {IERC20} from 'forge-std/interfaces/IERC20.sol';
+import {AaveV3Metis, AaveV3MetisAssets} from 'aave-address-book/AaveV3Metis.sol';
+import {IAaveIncentivesController} from '../src/interfaces/IAaveIncentivesController.sol';
+import {IEmissionManager, ITransferStrategyBase, RewardsDataTypes, IEACAggregatorProxy} from '../src/interfaces/IEmissionManager.sol';
+import {LMSetupBaseTest} from './utils/LMSetupBaseTest.sol';
+
+contract EmissionTestMetMetis is LMSetupBaseTest {
+  address public constant override DEFAULT_INCENTIVES_CONTROLLER =
+    AaveV3Metis.DEFAULT_INCENTIVES_CONTROLLER;
+  /// @dev already deployed and configured transfer strategy contract
+  ITransferStrategyBase public constant override TRANSFER_STRATEGY =
+    ITransferStrategyBase(0xC353D1A5C4242F400b61EEe34dC2213cdAb4Ef80);
+  uint256 public constant override TOTAL_DISTRIBUTION = 60 * 65 ether; // 65 Metis/day
+  address public constant override REWARD_ASSET = AaveV3MetisAssets.Metis_UNDERLYING;
+  IEACAggregatorProxy public constant override REWARD_ORACLE =
+    IEACAggregatorProxy(AaveV3MetisAssets.Metis_ORACLE);
+  
+
+  address constant EMISSION_ADMIN = 0x97177cD80475f8b38945c1E77e12F0c9d50Ac84D; // Metis team
+  uint88 constant DURATION_DISTRIBUTION = 60 days;
+
+  address METIS_WHALE = 0xD3545B9E29cefd2273d2C6f64b4Ee8ebBaE5Af11;
+  address vWETH_WHALE = 0x77d0Fb80eb7902c9A8952A47e0D189dB845fceb7;
+
+  function setUp() public {
+    vm.createSelectFork(vm.rpcUrl('metis'), 20877598);
+  }
+
+  function test_metis_activation() public {
+    vm.startPrank(EMISSION_ADMIN);
+    /// @dev IMPORTANT!!
+    /// The emissions admin should have REWARD_ASSET funds, and have approved the TOTAL_DISTRIBUTION
+    /// amount to the transfer strategy. If not, REWARDS WILL ACCRUE FINE AFTER `configureAssets()`, BUT THEY
+    /// WILL NOT BE CLAIMABLE UNTIL THERE IS FUNDS AND ALLOWANCE.
+    /// It is possible to approve less than TOTAL_DISTRIBUTION and doing it progressively over time as users
+    /// accrue more, but that is a decision of the emission's admin
+    IERC20(REWARD_ASSET).approve(address(TRANSFER_STRATEGY), TOTAL_DISTRIBUTION);
+
+    IEmissionManager(AaveV3Metis.EMISSION_MANAGER).configureAssets(_getAssetConfigs());
+
+    emit log_named_bytes(
+      'calldata to submit from Gnosis Safe',
+      abi.encodeWithSelector(
+        IEmissionManager(AaveV3Metis.EMISSION_MANAGER).configureAssets.selector,
+        _getAssetConfigs()
+      )
+    );
+
+    vm.stopPrank();
+
+    // fund the emissions admin
+    vm.startPrank(METIS_WHALE);
+    IERC20(REWARD_ASSET).transfer(EMISSION_ADMIN, TOTAL_DISTRIBUTION);
+    vm.stopPrank();
+
+    // test claim rewards
+    vm.startPrank(vWETH_WHALE);
+    vm.warp(block.timestamp + DURATION_DISTRIBUTION);
+
+    address[] memory assets = new address[](1);
+    assets[0] = AaveV3MetisAssets.WETH_V_TOKEN;
+
+    uint256 balanceBefore = IERC20(REWARD_ASSET).balanceOf(vWETH_WHALE);
+
+    IAaveIncentivesController(AaveV3Metis.DEFAULT_INCENTIVES_CONTROLLER).claimRewards(
+      assets,
+      type(uint256).max,
+      vWETH_WHALE,
+      REWARD_ASSET
+    );
+
+    uint256 vWethWhaleBalance = IERC20(AaveV3MetisAssets.WETH_V_TOKEN).balanceOf(vWETH_WHALE);
+    uint256 vWethSupply = IERC20(AaveV3MetisAssets.WETH_V_TOKEN).totalSupply();
+
+    uint256 balanceAfter = IERC20(REWARD_ASSET).balanceOf(vWETH_WHALE);
+
+    uint256 expectedRewards = vWethWhaleBalance * (TOTAL_DISTRIBUTION * 3_35 / 10000) / vWethSupply;
+    uint256 deviationAccepted = 2 ether;
+    assertApproxEqAbs(
+      balanceAfter - balanceBefore,
+      expectedRewards,
+      deviationAccepted,
+      'Invalid delta on claimed rewards'
+    );
+    vm.stopPrank();
+  }
+
+  function _getAssetConfigs() internal view override returns (RewardsDataTypes.RewardsConfigInput[] memory) {
+    uint32 distributionEnd = uint32(block.timestamp + DURATION_DISTRIBUTION);
+
+    EmissionPerAsset[] memory emissionsPerAsset = _getEmissionsPerAsset();
+
+    RewardsDataTypes.RewardsConfigInput[]
+      memory configs = new RewardsDataTypes.RewardsConfigInput[](emissionsPerAsset.length);
+    for (uint256 i = 0; i < emissionsPerAsset.length; i++) {
+      configs[i] = RewardsDataTypes.RewardsConfigInput({
+        emissionPerSecond: _toUint88(emissionsPerAsset[i].emission / DURATION_DISTRIBUTION),
+        totalSupply: 0, // IMPORTANT this will not be taken into account by the contracts, so 0 is fine
+        distributionEnd: distributionEnd,
+        asset: emissionsPerAsset[i].asset,
+        reward: REWARD_ASSET,
+        transferStrategy: TRANSFER_STRATEGY,
+        rewardOracle: REWARD_ORACLE
+      });
+    }
+
+    return configs;
+  }
+
+  function _getEmissionsPerAsset() internal pure override returns (EmissionPerAsset[] memory) {
+    EmissionPerAsset[] memory emissionsPerAsset = new EmissionPerAsset[](6);
+
+    emissionsPerAsset[0] = EmissionPerAsset({
+      asset: AaveV3MetisAssets.Metis_A_TOKEN,
+      emission: TOTAL_DISTRIBUTION * 48 / 100 // 48% of the distribution
+    });
+    emissionsPerAsset[1] = EmissionPerAsset({
+      asset: AaveV3MetisAssets.WETH_A_TOKEN,
+      emission: TOTAL_DISTRIBUTION * 1_65 / 10000 // 1.65% of the distribution
+    });
+    emissionsPerAsset[2] = EmissionPerAsset({
+      asset: AaveV3MetisAssets.Metis_V_TOKEN,
+      emission: TOTAL_DISTRIBUTION * 5 / 100 // 5% of the distribution
+    });
+    emissionsPerAsset[3] = EmissionPerAsset({
+      asset: AaveV3MetisAssets.mUSDC_V_TOKEN,
+      emission: TOTAL_DISTRIBUTION * 22 / 100 // 22% of the distribution
+    });
+    emissionsPerAsset[4] = EmissionPerAsset({
+      asset: AaveV3MetisAssets.mUSDT_V_TOKEN,
+      emission: TOTAL_DISTRIBUTION * 20 / 100 // 20% of the distribution
+    });
+    emissionsPerAsset[5] = EmissionPerAsset({
+      asset: AaveV3MetisAssets.WETH_V_TOKEN,
+      emission: TOTAL_DISTRIBUTION * 3_35 / 10000 // 3.35% of the distribution
+    });
+
+    uint256 totalDistribution;
+    for (uint256 i = 0; i < emissionsPerAsset.length; i++) {
+      totalDistribution += emissionsPerAsset[i].emission;
+    }
+    require(totalDistribution == TOTAL_DISTRIBUTION, 'INVALID_SUM_OF_EMISSIONS');
+
+    return emissionsPerAsset;
+  }
+}
